@@ -1,12 +1,6 @@
 import {defs, tiny} from './examples/common.js';
-import {Axes_Viewer, Axes_Viewer_Test_Scene} from "./examples/axes-viewer.js"
-import {Collision_Demo, Inertia_Demo} from "./examples/collisions-demo.js"
-import {Many_Lights_Demo} from "./examples/many-lights-demo.js"
-import {Obj_File_Demo} from "./examples/obj-file-demo.js"
-import {Scene_To_Texture_Demo} from "./examples/scene-to-texture-demo.js"
-import {Surfaces_Demo} from "./examples/surfaces-demo.js"
-import {Text_Demo} from "./examples/text-demo.js"
-import {Transforms_Sandbox} from "./examples/transforms-sandbox.js"
+import {Rain} from "./examples/rain.js"
+import {Inertia_Demo} from "./examples/collisions-demo.js";
 import {GriffithScene} from "./griffithScene.js";
 
 // Pull these names into this module's scope for convenience:
@@ -26,15 +20,8 @@ const {
 const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo;
 
 Object.assign(defs,
-    {Axes_Viewer, Axes_Viewer_Test_Scene},
-    {Inertia_Demo, Collision_Demo},
-    {Many_Lights_Demo},
-    {Obj_File_Demo},
-    {Scene_To_Texture_Demo},
-    {Surfaces_Demo},
-    {Text_Demo},
-    {Transforms_Sandbox},
-    {griffithScene: GriffithScene}
+    {griffithScene: GriffithScene},
+    {rain: Rain}
 );
 
 // ******************** End extra step
@@ -42,6 +29,6 @@ Object.assign(defs,
 // (Can define Main_Scene's class here)
 
 const Main_Scene = GriffithScene;
-const Additional_Scenes = [];
+const Additional_Scenes = [Rain];
 
 export {Main_Scene, Additional_Scenes, Canvas_Widget, Code_Widget, Text_Widget, defs}
