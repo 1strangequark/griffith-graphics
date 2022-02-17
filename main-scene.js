@@ -1,5 +1,5 @@
 import {defs, tiny} from './examples/common.js';
-import {Rain} from "./examples/rain.js"
+import {Rain} from "./rain.js"
 import {Inertia_Demo} from "./examples/collisions-demo.js";
 import {GriffithScene} from "./griffithScene.js";
 
