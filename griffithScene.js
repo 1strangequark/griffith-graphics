@@ -15,6 +15,7 @@ export class GriffithScene extends Scene {
             torus2: new defs.Torus(3, 15),
             sphere: new defs.Subdivision_Sphere(4),
             circle: new defs.Regular_2D_Polygon(1, 15),
+            square: new defs.Square(),
             // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
         };
@@ -25,6 +26,10 @@ export class GriffithScene extends Scene {
                 {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
             test2: new Material(new Gouraud_Shader(),
                 {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
+            grass: new Material(new Gouraud_Shader(),
+                {ambient: 1, diffusivity: 0.9, color: hex_color("#466d46")}),
+            sky: new Material(new Gouraud_Shader(),
+                {ambient: 1, diffusivity: 0, color: hex_color("#0099cc")}),
             ring: new Material(new Ring_Shader()),
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
@@ -61,6 +66,9 @@ export class GriffithScene extends Scene {
         const yellow = hex_color("#fac91a");
         let model_transform = Mat4.identity();
 
+        this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
+            .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), this.materials.grass);
+        this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky);
         this.shapes.torus.draw(context, program_state, model_transform, this.materials.test.override({color: yellow}));
     }
 }
