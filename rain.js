@@ -58,9 +58,12 @@ export class Simulation extends Scene {
     // the simulation from the frame rate (see below).
     constructor() {
         super();
-        Object.assign(this, {time_accumulator: 0, time_scale: 1, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
+        Object.assign(this, {time_accumulator: 0, time_scale: 1, rain_enabled: true, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
     }
 
+    get rainEnabled() {
+        return this.rain_enabled;
+    }
     simulate(frame_time) {
         frame_time = this.time_scale * frame_time;
         this.time_accumulator += Math.min(frame_time, 0.1);
@@ -77,8 +80,9 @@ export class Simulation extends Scene {
     }
 
     make_control_panel() {
-        this.key_triggered_button("Speed up time", ["Shift", "T"], () => this.time_scale *= 5);
-        this.key_triggered_button("Slow down time", ["t"], () => this.time_scale /= 5);
+        this.key_triggered_button("Toggle Rain", ["t"], () => this.rain_enabled = !this.rain_enabled);
+        this.key_triggered_button("Speed up time", ["Shift", "T"], () => this.time_scale *= 2);
+        this.key_triggered_button("Slow down time", ["t"], () => this.time_scale /= 2);
         this.new_line();
         this.live_string(box => {
             box.textContent = "Time scale: " + this.time_scale
@@ -144,12 +148,13 @@ export class Rain extends Simulation {
 
     update_state(dt) {
         console.log(dt);
-        
-        while (this.bodies.length < 1000)
-            this.bodies.push(new Body(this.data.get_droplet(), this.material, vec3(1, 1 + Math.random(), 1))
-                .emplace(Mat4.translation(...vec3(randomRange(-50, 50), 30, randomRange(-50, 50)).randomized(20)),
-                    vec3(0, -1, 0).randomized(2).normalized().times(3), Math.random()));
 
+        if(super.rainEnabled) {
+            while (this.bodies.length < 1000)
+                this.bodies.push(new Body(this.data.get_droplet(), this.material, vec3(1, 1 + Math.random(), 1))
+                    .emplace(Mat4.translation(...vec3(randomRange(-50, 50), 30, randomRange(-50, 50)).randomized(20)),
+                        vec3(0, -1, 0).randomized(2).normalized().times(3), Math.random()));
+        }
         for (let b of this.bodies) {
             // Gravity on Earth, where 1 unit in world space = 1 meter:
             b.linear_velocity[1] += dt * -9.8;
