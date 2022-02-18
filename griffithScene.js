@@ -35,7 +35,7 @@ export class GriffithScene extends Scene {
             //        (Requirement 4)
         }
 
-        this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
+        this.initial_camera_location = Mat4.look_at(vec3(0, 0, 20), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
     make_control_panel() {
@@ -70,6 +70,7 @@ export class GriffithScene extends Scene {
             .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), this.materials.grass);
         this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky);
         this.shapes.torus.draw(context, program_state, model_transform, this.materials.test.override({color: yellow}));
+
     }
 }
 
