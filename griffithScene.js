@@ -13,7 +13,7 @@ export class GriffithScene extends Scene {
         this.shapes = {
             torus: new defs.Torus(15, 15),
             torus2: new defs.Torus(3, 15),
-            sphere: new defs.Subdivision_Sphere(4),
+            sphere: new defs.Subdivision_Sphere(2),
             circle: new defs.Regular_2D_Polygon(1, 30),
             cube: new defs.Cube(),
             square: new defs.Square(),
@@ -29,15 +29,14 @@ export class GriffithScene extends Scene {
                 {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
             test2: new Material(new Gouraud_Shader(),
                 {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
-            grass: new Material(new Gouraud_Shader(),
+            grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0.9, color: hex_color("#466d46")}),
-            dark_grass: new Material(new Gouraud_Shader(),
+            dark_grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0.9, color: hex_color("#2f5128")}),
-            concrete: new Material(new Gouraud_Shader(),
-                {ambient: 1, diffusivity: 0.9, color: hex_color("#cecdcb")}),
-            sky: new Material(new Gouraud_Shader(),
+            concrete: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 0.9, specularity: .2, smoothness: .9, color: hex_color("#cecdcb")}),
+            sky: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, color: hex_color("#0099cc")}),
-            ring: new Material(new Ring_Shader()),
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
         }
@@ -81,6 +80,10 @@ export class GriffithScene extends Scene {
         // Create platform for observatory to rest on
         let platform_square_transform = Mat4.identity().times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(20, 30, 3));
         this.shapes.cube.draw(context, program_state, platform_square_transform, this.materials.concrete);
+
+        //Create a hill
+        let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
+        this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
     }
 }
 
