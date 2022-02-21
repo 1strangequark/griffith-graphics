@@ -53,7 +53,7 @@ export class GriffithScene extends Scene {
     }
 
     display_grass_patches(context, program_state) {
-        let platform_grass_transform = Mat4.identity().times(Mat4.translation(10, 3.01, 0)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(3, 5, 3));
+        let platform_grass_transform = Mat4.identity().times(Mat4.translation(10, 3.05, 0)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(3, 5, 3));
         let platform_grass_transform2 = platform_grass_transform.times(Mat4.translation(0, -2.2, 0));
         let platform_grass_transform3 = platform_grass_transform.times(Mat4.translation(-2.4, 0, 0));
         let platform_grass_transform4 = platform_grass_transform2.times(Mat4.translation(-2.4, 0, 0));
