@@ -58,7 +58,7 @@ export class Simulation extends Scene {
     // the simulation from the frame rate (see below).
     constructor() {
         super();
-        Object.assign(this, {time_accumulator: 0, time_scale: 1, rain_enabled: true, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
+        Object.assign(this, {time_accumulator: 0, time_scale: 1, rain_enabled: false, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
     }
 
     get rainEnabled() {

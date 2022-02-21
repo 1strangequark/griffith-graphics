@@ -1,7 +1,14 @@
 import {defs, tiny} from './examples/common.js';
 import {Rain} from "./rain.js"
-import {Inertia_Demo} from "./examples/collisions-demo.js";
 import {GriffithScene} from "./griffithScene.js";
+import {Axes_Viewer, Axes_Viewer_Test_Scene} from "./examples/axes-viewer.js"
+import {Collision_Demo, Inertia_Demo} from "./examples/collisions-demo.js"
+import {Many_Lights_Demo} from "./examples/many-lights-demo.js"
+import {Obj_File_Demo} from "./examples/obj-file-demo.js"
+import {Scene_To_Texture_Demo} from "./examples/scene-to-texture-demo.js"
+import {Surfaces_Demo} from "./examples/surfaces-demo.js"
+import {Text_Demo} from "./examples/text-demo.js"
+import {Transforms_Sandbox} from "./examples/transforms-sandbox.js"
 
 // Pull these names into this module's scope for convenience:
 const {
@@ -21,7 +28,15 @@ const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo;
 
 Object.assign(defs,
     {griffithScene: GriffithScene},
-    {rain: Rain}
+    {rain: Rain},
+    {Axes_Viewer, Axes_Viewer_Test_Scene},
+    {Inertia_Demo, Collision_Demo},
+    {Many_Lights_Demo},
+    {Obj_File_Demo},
+    {Scene_To_Texture_Demo},
+    {Surfaces_Demo},
+    {Text_Demo},
+    {Transforms_Sandbox},
 );
 
 // ******************** End extra step
