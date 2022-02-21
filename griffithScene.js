@@ -33,6 +33,8 @@ export class GriffithScene extends Scene {
                 {ambient: 1, diffusivity: 0.9, color: hex_color("#466d46")}),
             dark_grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0.9, color: hex_color("#2f5128")}),
+            light_grass: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 0.9, color: hex_color("#4d7c32")}),
             concrete: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0.9, specularity: .2, smoothness: .9, color: hex_color("#cecdcb")}),
             sky: new Material(new defs.Phong_Shader(),
@@ -48,6 +50,20 @@ export class GriffithScene extends Scene {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
         this.key_triggered_button("Example Command Name", ["Control", "0"], () => this.attached = () => null);
         this.new_line();
+    }
+
+    display_grass_patches(context, program_state) {
+        let platform_grass_transform = Mat4.identity().times(Mat4.translation(10, 3.01, 0)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(3, 5, 3));
+        let platform_grass_transform2 = platform_grass_transform.times(Mat4.translation(0, -2.2, 0));
+        let platform_grass_transform3 = platform_grass_transform.times(Mat4.translation(-2.4, 0, 0));
+        let platform_grass_transform4 = platform_grass_transform2.times(Mat4.translation(-2.4, 0, 0));
+        let platform_grass_transform5 = platform_grass_transform.times(Mat4.translation(-6.5, -1, 0)).times(Mat4.scale(2.5, 2, 2));
+        let material = this.materials.light_grass;
+        this.shapes.square.draw(context, program_state, platform_grass_transform, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform2, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform3, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform4, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform5, material);
     }
 
     display(context, program_state) {
@@ -80,6 +96,9 @@ export class GriffithScene extends Scene {
         // Create platform for observatory to rest on
         let platform_square_transform = Mat4.identity().times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(20, 30, 3));
         this.shapes.cube.draw(context, program_state, platform_square_transform, this.materials.concrete);
+
+        // Create grass on platform
+        this.display_grass_patches(context, program_state);
 
         //Create a hill
         let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
