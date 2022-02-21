@@ -38,7 +38,7 @@ export class GriffithScene extends Scene {
             concrete: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#cecdcb")}),
             sky: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 0, color: hex_color("#0099cc")}),
+                {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
         }
