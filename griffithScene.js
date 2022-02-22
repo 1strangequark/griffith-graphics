@@ -13,9 +13,12 @@ export class GriffithScene extends Scene {
         this.shapes = {
             torus: new defs.Torus(15, 15),
             torus2: new defs.Torus(3, 15),
-            sphere: new defs.Subdivision_Sphere(4),
-            circle: new defs.Regular_2D_Polygon(1, 15),
+            sphere: new defs.Subdivision_Sphere(2),
+            circle: new defs.Regular_2D_Polygon(1, 30),
+            cube: new defs.Cube(),
             square: new defs.Square(),
+            triangle: new defs.Triangle(),
+            axes: new defs.Axis_Arrows(),
             // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
         };
@@ -26,22 +29,41 @@ export class GriffithScene extends Scene {
                 {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
             test2: new Material(new Gouraud_Shader(),
                 {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
-            grass: new Material(new Gouraud_Shader(),
-                {ambient: 1, diffusivity: 0.9, color: hex_color("#466d46")}),
-            sky: new Material(new Gouraud_Shader(),
-                {ambient: 1, diffusivity: 0, color: hex_color("#0099cc")}),
-            ring: new Material(new Ring_Shader()),
+            grass: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46")}),
+            dark_grass: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#2f5128")}),
+            light_grass: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
+            concrete: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#cecdcb")}),
+            sky: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
         }
 
-        this.initial_camera_location = Mat4.look_at(vec3(0, 0, 20), vec3(0, 0, 0), vec3(0, 1, 0));
+        this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
     }
 
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
         this.key_triggered_button("Example Command Name", ["Control", "0"], () => this.attached = () => null);
         this.new_line();
+    }
+
+    display_grass_patches(context, program_state) {
+        let platform_grass_transform = Mat4.identity().times(Mat4.translation(10, 3.05, 0)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(3, 5, 3));
+        let platform_grass_transform2 = platform_grass_transform.times(Mat4.translation(0, -2.2, 0));
+        let platform_grass_transform3 = platform_grass_transform.times(Mat4.translation(-2.4, 0, 0));
+        let platform_grass_transform4 = platform_grass_transform2.times(Mat4.translation(-2.4, 0, 0));
+        let platform_grass_transform5 = platform_grass_transform.times(Mat4.translation(-6.5, -1, 0)).times(Mat4.scale(2.5, 2, 2));
+        let material = this.materials.light_grass;
+        this.shapes.square.draw(context, program_state, platform_grass_transform, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform2, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform3, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform4, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform5, material);
     }
 
     display(context, program_state) {
@@ -66,11 +88,21 @@ export class GriffithScene extends Scene {
         const yellow = hex_color("#fac91a");
         let model_transform = Mat4.identity();
 
+        //Draw the ground and sky
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
             .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), this.materials.grass);
         this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky);
-        this.shapes.torus.draw(context, program_state, model_transform, this.materials.test.override({color: yellow}));
 
+        // Create platform for observatory to rest on
+        let platform_square_transform = Mat4.identity().times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(20, 30, 3));
+        this.shapes.cube.draw(context, program_state, platform_square_transform, this.materials.concrete);
+
+        // Create grass on platform
+        this.display_grass_patches(context, program_state);
+
+        //Create a hill
+        let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
+        this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
     }
 }
 
