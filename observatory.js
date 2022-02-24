@@ -4,7 +4,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
 } = tiny;
 
-export class GriffithScene extends Scene {
+export class ObservatoryScene extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
@@ -13,12 +13,14 @@ export class GriffithScene extends Scene {
         this.shapes = {
             torus: new defs.Torus(15, 15),
             torus2: new defs.Torus(3, 15),
-            sphere: new defs.Subdivision_Sphere(2),
+            sphere: new defs.Subdivision_Sphere(5),
+            capped_cylinder: new defs.Capped_Cylinder(5, 5, [[0, 2], [0, 1]]),
             circle: new defs.Regular_2D_Polygon(1, 30),
             cube: new defs.Cube(),
             square: new defs.Square(),
             triangle: new defs.Triangle(),
             axes: new defs.Axis_Arrows(),
+            cylinder: new defs.Cylindrical_Tube(15, 15),
         };
 
         // *** Materials
@@ -34,7 +36,9 @@ export class GriffithScene extends Scene {
             light_grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
             concrete: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#dbdbdd")}),
+                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#cecdcb")}),
+            observatory_roof: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#161c96")}),
             sky: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
         }
@@ -48,18 +52,54 @@ export class GriffithScene extends Scene {
         this.new_line();
     }
 
-    display_grass_patches(context, program_state) {
-        let platform_grass_transform = Mat4.identity().times(Mat4.translation(10, 3.05, 0)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(3, 5, 3));
-        let platform_grass_transform2 = platform_grass_transform.times(Mat4.translation(0, -2.2, 0));
-        let platform_grass_transform3 = platform_grass_transform.times(Mat4.translation(-2.4, 0, 0));
-        let platform_grass_transform4 = platform_grass_transform2.times(Mat4.translation(-2.4, 0, 0));
-        let platform_grass_transform5 = platform_grass_transform.times(Mat4.translation(-6.5, -1, 0)).times(Mat4.scale(2.5, 2, 2));
-        let material = this.materials.light_grass;
-        this.shapes.square.draw(context, program_state, platform_grass_transform, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform2, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform3, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform4, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform5, material);
+    display_windows(context, program_state) {
+        let window_offset = 3;
+        while (window_offset < 13) {
+            let window_transform = Mat4.identity().times(Mat4.translation(window_offset, 4.7, 13).times(Mat4.scale(0.5,1,2)));
+            this.shapes.cube.draw(context, program_state, window_transform, this.materials.concrete);
+            let back_plate_transform = window_transform.times(Mat4.translation(2,0,1));
+            this.shapes.square.draw(context, program_state, back_plate_transform, this.materials.concrete);
+            window_offset += 2;
+        }
+        window_offset = -3.5;
+        while (window_offset > -14) {
+            let window_transform = Mat4.identity().times(Mat4.translation(window_offset, 4.7, 13).times(Mat4.scale(0.5,1,2)));
+            this.shapes.cube.draw(context, program_state, window_transform, this.materials.concrete);
+            let back_plate_transform = window_transform.times(Mat4.translation(-2,0,1));
+            this.shapes.square.draw(context, program_state, back_plate_transform, this.materials.concrete);
+            window_offset -= 2;
+        }
+    }
+
+    display_entryway(context, program_state) {
+        let left_doorway_transform = Mat4.identity().times(Mat4.translation(2, 4, 13).times(Mat4.scale(0.5,2,2)));
+        this.shapes.cube.draw(context, program_state, left_doorway_transform, this.materials.concrete);
+        let right_doorway_transform = Mat4.identity().times(Mat4.translation(-2.5, 4, 13).times(Mat4.scale(0.5,2,2)));
+        this.shapes.cube.draw(context, program_state, right_doorway_transform, this.materials.concrete);
+        let entryway_top = Mat4.identity().times(Mat4.translation(-0.25, 6.25, 13).times(Mat4.scale(3,.25,2)));
+        this.shapes.cube.draw(context, program_state, entryway_top, this.materials.concrete);
+        let entryway_bottom = Mat4.identity().times(Mat4.translation(-0.25, 3.25, 13).times(Mat4.scale(3,.25,2)));
+        this.shapes.cube.draw(context, program_state, entryway_bottom, this.materials.concrete);
+    }
+
+    display_roofs(context, program_state) {
+        let roof_1_size = 5.85;
+        let roof_1_transform = Mat4.identity().times(Mat4.translation(0, 8, 25)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(roof_1_size, roof_1_size, roof_1_size));
+        this.shapes.sphere.draw(context, program_state, roof_1_transform, this.materials.observatory_roof);
+        let roof_separation = 6.15;
+        let roof_2_transform = roof_1_transform.times(Mat4.scale(0.4, 0.4, 0.4)).times(Mat4.translation(roof_separation, -5.125, 0.5));
+        this.shapes.sphere.draw(context, program_state, roof_2_transform, this.materials.observatory_roof);
+        let roof_3_transform = roof_2_transform.times(Mat4.translation(-2.0 * roof_separation, 0, 0))
+        this.shapes.sphere.draw(context, program_state, roof_3_transform, this.materials.observatory_roof);
+    }
+
+    display_building_body (context, program_state) {
+        let building_center_transform = Mat4.identity().times(Mat4.translation(0, 4.5, 21)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(5, 6, 2));
+        this.shapes.cube.draw(context, program_state, building_center_transform, this.materials.concrete);
+        let building_topper_cube = building_center_transform.times(Mat4.translation(0, -1, -1)).times(Mat4.scale(0.7, 0.5, 0.25));
+        this.shapes.cube.draw(context, program_state, building_topper_cube, this.materials.concrete);
+        let building_ornament_transform = Mat4.identity().times(Mat4.scale(100, 100, 100)).times(Mat4.translation(0, 4.5, 21));
+        this.shapes.capped_cylinder.draw(context, program_state, building_ornament_transform, this.materials.observatory_roof);
     }
 
     display(context, program_state) {
@@ -73,37 +113,31 @@ export class GriffithScene extends Scene {
 
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
-
-        // this.shapes.[XXX].draw([XXX]) // <--example
-
-        const light_position = vec4(0, 5, 5, 1);
-        // The parameters of the Light are: position, color, size
-        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 1000)];
-
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
-        const yellow = hex_color("#fac91a");
-        let model_transform = Mat4.identity();
-
-        //Draw the ground and sky
-        this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
-            .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), this.materials.grass);
-        this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky);
-
-        // Create platform for observatory to rest on
-        let platform_square_transform = Mat4.identity().times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(20, 30, 3));
-        this.shapes.cube.draw(context, program_state, platform_square_transform, this.materials.concrete);
-
-        // Create grass on platform
-        this.display_grass_patches(context, program_state);
-
-        //Create a hill
-        let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
-        this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
+        let cylinder_1_transform = Mat4.identity().times(Mat4.translation(0, 3, 25)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(6, 6, 10));
+        this.shapes.cylinder.draw(context, program_state, cylinder_1_transform, this.materials.concrete);
+        let small_dome_separation = 6;
+        let cylinder_2_transform = cylinder_1_transform.times(Mat4.scale(0.4, 0.4, 0.8)).times(Mat4.translation(small_dome_separation, -5, 0));
+        this.shapes.cylinder.draw(context, program_state, cylinder_2_transform, this.materials.concrete);
+        let cylinder_3_transform = cylinder_2_transform.times(Mat4.translation(-2.0 * small_dome_separation, 0, 0))
+        this.shapes.cylinder.draw(context, program_state, cylinder_3_transform, this.materials.concrete);
+        let left_wall_transform = Mat4.identity().times(Mat4.translation(8, 6, 13).times(Mat4.scale(5.5,.5,2)));
+        let lower_left_wall_transform = left_wall_transform.times(Mat4.translation(0, -5, 0));
+        let right_wall_transform = left_wall_transform.times(Mat4.translation(-3, 0, 0));
+        let lower_right_wall_transform = right_wall_transform.times(Mat4.translation(0, -5, 0));
+        this.shapes.cube.draw(context, program_state, left_wall_transform, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state, lower_left_wall_transform, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state, right_wall_transform, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state, lower_right_wall_transform, this.materials.concrete);
+        this.display_windows(context, program_state);
+        this.display_entryway(context, program_state);
+        this.display_roofs(context, program_state);
+        this.display_building_body(context, program_state);
     }
 }
 
 class Gouraud_Shader extends Shader {
-    // This is a Shader using Phong_Shader as template
+    // This is a Shader using Phong_Shader as templated
 
     constructor(num_lights = 2) {
         super();
@@ -244,46 +278,6 @@ class Gouraud_Shader extends Shader {
 
         this.send_material(context, gpu_addresses, material);
         this.send_gpu_state(context, gpu_addresses, gpu_state, model_transform);
-    }
-}
-
-class Ring_Shader extends Shader {
-    update_GPU(context, gpu_addresses, graphics_state, model_transform, material) {
-        // update_GPU():  Defining how to synchronize our JavaScript's variables to the GPU's:
-        const [P, C, M] = [graphics_state.projection_transform, graphics_state.camera_inverse, model_transform],
-            PCM = P.times(C).times(M);
-        context.uniformMatrix4fv(gpu_addresses.model_transform, false, Matrix.flatten_2D_to_1D(model_transform.transposed()));
-        context.uniformMatrix4fv(gpu_addresses.projection_camera_model_transform, false,
-            Matrix.flatten_2D_to_1D(PCM.transposed()));
-    }
-
-    shared_glsl_code() {
-        // ********* SHARED CODE, INCLUDED IN BOTH SHADERS *********
-        return `
-        precision mediump float;
-        varying vec4 point_position;
-        varying vec4 center;
-        `;
-    }
-
-    vertex_glsl_code() {
-        // ********* VERTEX SHADER *********
-        return this.shared_glsl_code() + `
-        attribute vec3 position;
-        uniform mat4 model_transform;
-        uniform mat4 projection_camera_model_transform;
-        
-        void main(){
-          
-        }`;
-    }
-
-    fragment_glsl_code() {
-        // ********* FRAGMENT SHADER *********
-        return this.shared_glsl_code() + `
-        void main(){
-          
-        }`;
     }
 }
 
