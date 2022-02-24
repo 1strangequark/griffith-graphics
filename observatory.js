@@ -14,7 +14,7 @@ export class ObservatoryScene extends Scene {
             torus: new defs.Torus(15, 15),
             torus2: new defs.Torus(3, 15),
             sphere: new defs.Subdivision_Sphere(5),
-            capped_cylinder: new defs.Capped_Cylinder(5, 5, [[0, 2], [0, 1]]),
+            capped_cylinder: new defs.Capped_Cylinder(10, 10),
             circle: new defs.Regular_2D_Polygon(1, 30),
             cube: new defs.Cube(),
             square: new defs.Square(),
@@ -39,6 +39,8 @@ export class ObservatoryScene extends Scene {
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#cecdcb")}),
             observatory_roof: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#161c96")}),
+            observatory_decoration: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#1e6b61")}),
             sky: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
         }
@@ -98,9 +100,11 @@ export class ObservatoryScene extends Scene {
         this.shapes.cube.draw(context, program_state, building_center_transform, this.materials.concrete);
         let building_topper_cube = building_center_transform.times(Mat4.translation(0, -1, -1)).times(Mat4.scale(0.7, 0.5, 0.25));
         this.shapes.cube.draw(context, program_state, building_topper_cube, this.materials.concrete);
-        let building_ornament_transform = Mat4.identity().times(Mat4.scale(100, 100, 100)).times(Mat4.translation(0, 4.5, 21));
-        this.shapes.capped_cylinder.draw(context, program_state, building_ornament_transform, this.materials.observatory_roof);
-    }
+        let building_topper_cylinder = building_topper_cube.times(Mat4.translation(0, 0, -1.5)).times(Mat4.scale(1, 1, 1.25));
+        this.shapes.capped_cylinder.draw(context, program_state, building_topper_cylinder, this.materials.observatory_decoration);
+        let building_topper_sphere = building_topper_cylinder.times(Mat4.scale(0.8, 0.8, 2)).times(Mat4.translation(0, 0, 0));
+        this.shapes.sphere.draw(context, program_state, building_topper_sphere, this.materials.observatory_decoration);
+    }a
 
     display(context, program_state) {
         // display():  Called once per frame of animation.
