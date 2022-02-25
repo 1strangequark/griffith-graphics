@@ -19,8 +19,6 @@ export class GriffithScene extends Scene {
             square: new defs.Square(),
             triangle: new defs.Triangle(),
             axes: new defs.Axis_Arrows(),
-            // TODO:  Fill in as many additional shape instances as needed in this key/value table.
-            //        (Requirement 1)
         };
 
         // *** Materials
@@ -36,11 +34,9 @@ export class GriffithScene extends Scene {
             light_grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
             concrete: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#cecdcb")}),
+                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#dbdbdd")}),
             sky: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
-            // TODO:  Fill in as many additional material objects as needed in this key/value table.
-            //        (Requirement 4)
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
