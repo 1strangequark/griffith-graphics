@@ -33,6 +33,10 @@ export class GriffithScene extends Scene {
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#2f5128")}),
             light_grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
+            tree_leaves: new Material(new Gouraud_Shader(),
+                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#5aab61")}),
+            tree_trunk: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#795c34")}),
             concrete: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#dbdbdd")}),
             sky: new Material(new defs.Phong_Shader(),
@@ -60,6 +64,25 @@ export class GriffithScene extends Scene {
         this.shapes.square.draw(context, program_state, platform_grass_transform3, material);
         this.shapes.square.draw(context, program_state, platform_grass_transform4, material);
         this.shapes.square.draw(context, program_state, platform_grass_transform5, material);
+    }
+    
+    // Use this function to draw trees
+    // version is to select a different version of tree (default is 1))
+    display_tree(context, program_state, x, y, z, version = 1) {
+        if (version == 1) {
+            let leaves_transform = Mat4.identity().times(Mat4.translation(x, y+5, z));
+            let trunk_transform = leaves_transform.times(Mat4.scale(.1, 1, .1)).times(Mat4.translation(0, -1, 0));
+            this.shapes.sphere.draw(context, program_state, leaves_transform, this.materials.tree_leaves);
+            this.shapes.cube.draw(context, program_state, trunk_transform, this.materials.tree_trunk);
+        }
+        else {
+            let leaves_transform = Mat4.identity().times(Mat4.translation(x, y+5, z));
+            let leaves2_transform = leaves_transform.times(Mat4.translation(0, 1.4, 0)).times(Mat4.scale(1.4, 1.4, 1.4));
+            let trunk_transform = leaves_transform.times(Mat4.scale(.1, 1, .1)).times(Mat4.translation(0, -1, 0));
+            this.shapes.sphere.draw(context, program_state, leaves_transform, this.materials.tree_leaves);
+            this.shapes.sphere.draw(context, program_state, leaves2_transform, this.materials.tree_leaves);
+            this.shapes.cube.draw(context, program_state, trunk_transform, this.materials.tree_trunk);
+        }
     }
 
     display(context, program_state) {
@@ -99,6 +122,8 @@ export class GriffithScene extends Scene {
         //Create a hill
         let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
         this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
+
+       
     }
 }
 
