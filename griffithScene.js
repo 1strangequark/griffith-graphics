@@ -123,7 +123,25 @@ export class GriffithScene extends Scene {
         let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
         this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
 
-       
+        // Create trees on platform
+            // front and back (camera view)
+        let x = -23;
+        for (let i = 0; i < 2; i ++) {
+            this.display_tree(context, program_state, x, -2.4, -16, 2);
+            this.display_tree(context, program_state, x, -2.2, -13, 1);
+            this.display_tree(context, program_state, x, -2, -10, 2);
+            this.display_tree(context, program_state, x, -1.8, -7, 1);
+            this.display_tree(context, program_state, x, -1.5, -4, 2);
+            this.display_tree(context, program_state, x, -1.6, -1, 1);
+            this.display_tree(context, program_state, x, -1.8, 2, 2);
+            this.display_tree(context, program_state, x, -1.9, 5, 1);
+            this.display_tree(context, program_state, x, -2, 8, 2);
+            x = 25;
+        }
+            // platform
+        this.display_tree(context, program_state, -4, 0, 4, 2);
+        this.display_tree(context, program_state, 4, 0, -7, 2);
+        this.display_tree(context, program_state, 4, 0, -9, 1);
     }
 }
 
