@@ -19,6 +19,7 @@ export class GriffithScene extends Scene {
             square: new defs.Square(),
             triangle: new defs.Triangle(),
             axes: new defs.Axis_Arrows(),
+            sun: new defs.Subdivision_Sphere(4),
             // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
         };
@@ -39,6 +40,8 @@ export class GriffithScene extends Scene {
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#cecdcb")}),
             sky: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
+            sun:  new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1.0, specularity: 0,color: hex_color("#fcba03")}),
             // TODO:  Fill in as many additional material objects as needed in this key/value table.
             //        (Requirement 4)
         }
@@ -52,6 +55,26 @@ export class GriffithScene extends Scene {
         this.new_line();
     }
 
+    day_night_sequence(context, program_state, t, period = 10) {
+        // period is the duration of day or night
+        // i.e. period of 10 => sun cycle lasts 10 seconds and moon cycle lasts 10 seconds
+        let theta = 2 * Math.PI / period;
+        let cameraY = program_state.camera_inverse[1][3];
+        console.log(cameraY);
+        console.log(program_state);
+
+        let transform = Mat4.identity();
+        let x = -200 + 200 * Math.cos(theta* t);
+        let y =   100 * Math.sin(theta* t );
+        console.log("X: " + x + " y: " + y);
+       let transform2 = Mat4.identity();
+           transform2=transform2.times(Mat4.translation(-15.35, -7.69, -38.72));
+
+        transform = transform.times(Mat4.translation(x,y,0)).times(Mat4.translation(400, 5, 250)).times(Mat4.scale(4.5,4.5,4.5));
+        if(cameraY )
+        this.shapes.sun.draw(context, program_state, transform, this.materials.sun);
+        this.shapes.sun.draw(context, program_state, transform2, this.materials.sun);
+    }
     display_grass_patches(context, program_state) {
         let platform_grass_transform = Mat4.identity().times(Mat4.translation(10, 3.05, 0)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(3, 5, 3));
         let platform_grass_transform2 = platform_grass_transform.times(Mat4.translation(0, -2.2, 0));
@@ -103,6 +126,9 @@ export class GriffithScene extends Scene {
         //Create a hill
         let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
         this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
+
+        // create day and night sequence
+        this.day_night_sequence(context, program_state, t);
     }
 }
 
