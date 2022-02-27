@@ -9,6 +9,7 @@ import {Scene_To_Texture_Demo} from "./examples/scene-to-texture-demo.js"
 import {Surfaces_Demo} from "./examples/surfaces-demo.js"
 import {Text_Demo} from "./examples/text-demo.js"
 import {Transforms_Sandbox} from "./examples/transforms-sandbox.js"
+import {ObservatoryScene} from "./observatory.js";
 
 // Pull these names into this module's scope for convenience:
 const {
@@ -29,6 +30,7 @@ const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo;
 Object.assign(defs,
     {griffithScene: GriffithScene},
     {rain: Rain},
+    {observatory: ObservatoryScene},
     {Axes_Viewer, Axes_Viewer_Test_Scene},
     {Inertia_Demo, Collision_Demo},
     {Many_Lights_Demo},
@@ -44,6 +46,6 @@ Object.assign(defs,
 // (Can define Main_Scene's class here)
 
 const Main_Scene = GriffithScene;
-const Additional_Scenes = [Rain];
+const Additional_Scenes = [Rain, ObservatoryScene];
 
 export {Main_Scene, Additional_Scenes, Canvas_Widget, Code_Widget, Text_Widget, defs}
