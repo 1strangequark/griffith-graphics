@@ -68,7 +68,6 @@ export class ObservatoryScene extends Scene {
     }
 
     display_entryway(context, program_state) {
-        //salam
         let left_doorway_transform = Mat4.identity().times(Mat4.translation(2, 4, 13).times(Mat4.scale(0.5,2,2)));
         this.shapes.cube.draw(context, program_state, left_doorway_transform, this.materials.concrete);
         let right_doorway_transform = Mat4.identity().times(Mat4.translation(-2.5, 4, 13).times(Mat4.scale(0.5,2,2)));
