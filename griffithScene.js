@@ -14,6 +14,7 @@ export class GriffithScene extends Scene {
             torus: new defs.Torus(15, 15),
             torus2: new defs.Torus(3, 15),
             sphere: new defs.Subdivision_Sphere(2),
+            sphere2: new defs.Subdivision_Sphere(4),
             circle: new defs.Regular_2D_Polygon(1, 30),
             cube: new defs.Cube(),
             square: new defs.Square(),
@@ -24,7 +25,7 @@ export class GriffithScene extends Scene {
         // *** Materials
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
-                {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
+                {ambient: .5, diffusivity: .6, color: hex_color("#ffffff")}),
             test2: new Material(new Gouraud_Shader(),
                 {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
             grass: new Material(new defs.Phong_Shader(),
@@ -49,20 +50,38 @@ export class GriffithScene extends Scene {
     }
 
     display_grass_patches(context, program_state) {
+
         let platform_grass_transform = Mat4.identity().times(Mat4.translation(10, 3.05, 0)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(3, 5, 3));
         let platform_grass_transform2 = platform_grass_transform.times(Mat4.translation(0, -2.2, 0));
         let platform_grass_transform3 = platform_grass_transform.times(Mat4.translation(-2.4, 0, 0));
         let platform_grass_transform4 = platform_grass_transform2.times(Mat4.translation(-2.4, 0, 0));
         let platform_grass_transform5 = platform_grass_transform.times(Mat4.translation(-6.5, -1, 0)).times(Mat4.scale(2.5, 2, 2));
+
         let material = this.materials.light_grass;
         this.shapes.square.draw(context, program_state, platform_grass_transform, material);
         this.shapes.square.draw(context, program_state, platform_grass_transform2, material);
         this.shapes.square.draw(context, program_state, platform_grass_transform3, material);
         this.shapes.square.draw(context, program_state, platform_grass_transform4, material);
         this.shapes.square.draw(context, program_state, platform_grass_transform5, material);
+
     }
 
-    display(context, program_state) {
+    display_Statue(context, program_state) {
+
+        let platform_statue_transform1 = Mat4.identity().times(Mat4.translation(6.4,3,-5.5)).times(Mat4.scale(0.5,0.75,0.5));
+        let platform_statue_transform2 = Mat4.identity().times(Mat4.translation(6.4,4,-5.5)).times(Mat4.scale(0.4,0.8,0.4));
+        let platform_statue_transform3 = Mat4.identity().times(Mat4.translation(6.4,5,-5.5)).times(Mat4.scale(0.28,1.5,0.28));
+        let platform_statue_transform4 = Mat4.identity().times(Mat4.translation(6.4,6,-5.5)).times(Mat4.scale(0.28,1.5,0.28));
+
+        this.shapes.cube.draw(context, program_state,platform_statue_transform1, this.materials.test);
+        this.shapes.cube.draw(context, program_state,platform_statue_transform2, this.materials.test);
+        this.shapes.cube.draw(context, program_state,platform_statue_transform3, this.materials.test);
+        this.shapes.sphere2.draw(context, program_state,platform_statue_transform4, this.materials.test);
+
+    }
+
+
+        display(context, program_state) {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
@@ -95,6 +114,9 @@ export class GriffithScene extends Scene {
 
         // Create grass on platform
         this.display_grass_patches(context, program_state);
+
+        //create statue in the courtyard
+        this.display_Statue(context,program_state);
 
         //Create a hill
         let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
