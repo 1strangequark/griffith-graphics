@@ -122,14 +122,6 @@ export class GriffithScene extends Scene {
 
     }
 
-    // display_lights(context, program_state, x, z)
-    // {
-    //     const yellow1 = hex_color("#fac91a");
-    //     let light_position1 = vec4(x, 5, z, 1);
-    //     program_state.lights = [new Light(light_position1, yellow1, 10)];
-    // }
-
-
         display(context, program_state) {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
@@ -150,7 +142,6 @@ export class GriffithScene extends Scene {
         // The parameters of the Light are: position, color, size
         program_state.lights = [
             new Light(light_position, color(0,0,0,1), 9),
-
             new Light(vec4(5.2, 5, 5.2, 1), yellow, 9),
             new Light(vec4(7.5, 5, 5.2, 1), yellow, 9),
             new Light(vec4(5.2, 5, -16.2, 1), yellow, 9),
@@ -163,7 +154,7 @@ export class GriffithScene extends Scene {
             new Light(vec4(-17.2, 5, 0.2, 1), yellow, 9),
             new Light(vec4(-5.2, 5, 5.2, 1), yellow, 9),
             new Light(vec4(-12.5, 5, 5.2, 1), yellow, 9),
-            new Light(vec4(-5.2, 5, 15.2, 1), yellow, 9),
+            new Light(vec4(-5.2, 5, -15.2, 1), yellow, 9),
             new Light(vec4(-12.5, 5, -15.2, 1), yellow, 9)
         ];
 
@@ -231,7 +222,7 @@ export class GriffithScene extends Scene {
 class Gouraud_Shader extends Shader {
     // This is a Shader using Phong_Shader as template
 
-    constructor(num_lights = 2) {
+    constructor(num_lights = 20) {
         super();
         this.num_lights = num_lights;
     }
