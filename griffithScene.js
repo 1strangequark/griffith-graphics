@@ -122,12 +122,12 @@ export class GriffithScene extends Scene {
 
     }
 
-    display_lights(context, program_state, x, z)
-    {
-        const yellow1 = hex_color("#fac91a");
-        let light_position1 = vec4(x, 5, z, 1);
-        program_state.lights = [new Light(light_position1, yellow1, 10)];
-    }
+    // display_lights(context, program_state, x, z)
+    // {
+    //     const yellow1 = hex_color("#fac91a");
+    //     let light_position1 = vec4(x, 5, z, 1);
+    //     program_state.lights = [new Light(light_position1, yellow1, 10)];
+    // }
 
 
         display(context, program_state) {
@@ -149,6 +149,8 @@ export class GriffithScene extends Scene {
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
+            new Light(light_position, color(0,0,0,1), 9),
+
             new Light(vec4(5.2, 5, 5.2, 1), yellow, 9),
             new Light(vec4(7.5, 5, 5.2, 1), yellow, 9),
             new Light(vec4(5.2, 5, -16.2, 1), yellow, 9),
@@ -162,8 +164,7 @@ export class GriffithScene extends Scene {
             new Light(vec4(-5.2, 5, 5.2, 1), yellow, 9),
             new Light(vec4(-12.5, 5, 5.2, 1), yellow, 9),
             new Light(vec4(-5.2, 5, 15.2, 1), yellow, 9),
-            new Light(vec4(-12.5, 5, -15.2, 1), yellow, 9),
-
+            new Light(vec4(-12.5, 5, -15.2, 1), yellow, 9)
         ];
 
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
