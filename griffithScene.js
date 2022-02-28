@@ -226,7 +226,7 @@ class Gouraud_Shader extends Shader {
         super();
         this.num_lights = num_lights;
     }
-
+a
     shared_glsl_code() {
         // ********* SHARED CODE, INCLUDED IN BOTH SHADERS *********
         return ` 
