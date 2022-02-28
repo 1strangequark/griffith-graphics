@@ -38,6 +38,10 @@ export class GriffithScene extends Scene {
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#dbdbdd")}),
             sky: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
+            lightBase: new Material(new defs.Phong_Shader(),
+                {ambient: 0.7, diffusivity: 0.5, specularity: 1, color: hex_color("#989292")}),
+            lightBulb: new Material(new defs.Phong_Shader(),
+                {ambient: 1, color: hex_color("#bdad07")}),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
@@ -80,6 +84,20 @@ export class GriffithScene extends Scene {
 
     }
 
+    display_courtyard_lights(context, program_state, x1, z1 ,x2, z2, x3, z3, x4, z4)
+    {
+        let platform_light_transform1 = Mat4.identity().times(Mat4.translation(x1,3,z1)).times(Mat4.scale(0.15,0.4,0.15));
+        let platform_light_transform2 = Mat4.identity().times(Mat4.translation(x2,3.5,z2)).times(Mat4.scale(0.13,0.3,0.13));
+        let platform_light_transform3 = Mat4.identity().times(Mat4.translation(x3,4,z3)).times(Mat4.scale(0.03,1,0.03));
+        let platform_light_transform4 = Mat4.identity().times(Mat4.translation(x4,5,z4)).times(Mat4.scale(0.16,0.16,0.16));
+
+        this.shapes.cube.draw(context, program_state,platform_light_transform1, this.materials.lightBase);
+        this.shapes.cube.draw(context, program_state,platform_light_transform3, this.materials.lightBase);
+        this.shapes.sphere2.draw(context, program_state,platform_light_transform2, this.materials.lightBase);
+        this.shapes.sphere2.draw(context, program_state,platform_light_transform4, this.materials.lightBulb);
+
+    }
+
 
         display(context, program_state) {
         // display():  Called once per frame of animation.
@@ -118,7 +136,30 @@ export class GriffithScene extends Scene {
         //create statue in the courtyard
         this.display_Statue(context,program_state);
 
-        //Create a hill
+        //courtyard light bases
+        this.display_courtyard_lights(context,program_state, 5.2,5.2,5.2,5.2,5.2,5.2,5.2,5.2);
+        this.display_courtyard_lights(context,program_state, 7.5,5.2,7.5,5.2,7.5,5.2,7.5,5.2);
+        this.display_courtyard_lights(context,program_state, 5.2,-16.2,5.2,-16.2,5.2,-16.2,5.2,-16.2);
+        this.display_courtyard_lights(context,program_state, 7.5,-16.2,7.5,-16.2,7.5,-16.2,7.5,-16.2);
+        this.display_courtyard_lights(context,program_state, 13.2,-11.2,13.2,-11.2,13.2,-11.2,13.2,-11.2);
+        this.display_courtyard_lights(context,program_state, 13.2,0.2,13.2,0.2,13.2,0.2,13.2,0.2);
+        this.display_courtyard_lights(context,program_state, -0.45,-11.2,-0.45,-11.2,-0.45,-11.2,-0.45,-11.2);
+        this.display_courtyard_lights(context,program_state, -0.45,0.2,-0.45,0.2,-0.45,0.2,-0.45,0.2);
+        this.display_courtyard_lights(context,program_state, -0.45,-11.2,-0.45,-11.2,-0.45,-11.2,-0.45,-11.2);
+        this.display_courtyard_lights(context,program_state, -0.45,0.2,-0.45,0.2,-0.45,0.2,-0.45,0.2);
+        this.display_courtyard_lights(context,program_state, -17.2,-11.2,-17.2,-11.2,-17.2,-11.2,-17.2,-11.2);
+        this.display_courtyard_lights(context,program_state, -17.2,0.2,-17.2,0.2,-17.2,0.2,-17.2,0.2);
+        this.display_courtyard_lights(context,program_state, -5.2,5.2,-5.2,5.2,-5.2,5.2,-5.2,5.2);
+        this.display_courtyard_lights(context,program_state, -12.5,5.2,-12.5,5.2,-12.5,5.2,-12.5,5.2);
+        this.display_courtyard_lights(context,program_state, -5.2,-15.2,-5.2,-15.2,-5.2,-15.2,-5.2,-15.2);
+        this.display_courtyard_lights(context,program_state, -12.5,-15.2,-12.5,-15.2,-12.5,-15.2,-12.5,-15.2);
+
+
+
+
+
+
+            //Create a hill
         let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
         this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
     }
