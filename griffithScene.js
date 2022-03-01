@@ -63,6 +63,7 @@ export class GriffithScene extends Scene {
         this.sun_rise = true;
         this.day_night_interval = 0;
         this.day_night_period = 10;
+        this.sun_moon_position;
     }
 
     change_day_night_period(speed_up) {
@@ -106,13 +107,15 @@ export class GriffithScene extends Scene {
         if(this.sun_rise){
             // simulate daylight
             transform = transform.times(Mat4.translation(x,y,z_1)).times(Mat4.scale(5,5,5));
-            this.shapes.sun.draw(context, program_state, transform, this.materials.sun);
+            //this.shapes.sun.draw(context, program_state, transform, this.materials.sun);
         } else {
             // simulate nighttime
             transform = transform.times(Mat4.translation(x,y,z_1)).times(Mat4.scale(5,5,5));
-            this.shapes.moon.draw(context, program_state, transform, this.materials.moon);
+            //this.shapes.moon.draw(context, program_state, transform, this.materials.moon);
 
         }
+
+        return transform;
     }
     display_grass_patches(context, program_state) {
 
@@ -195,10 +198,16 @@ export class GriffithScene extends Scene {
 
         const light_position = vec4(0, 5, 5, 1);
         const yellow = hex_color("#fac91a");
+        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
+        let model_transform = Mat4.identity();
+
+        // Calculate sun or moon position
+        let sun_moon_transform = this.day_night_sequence(context, program_state, t,dt);
+        this.sun_moon_position = vec4(sun_moon_transform[0][3], -sun_moon_transform[1][3], sun_moon_transform[2][3], sun_moon_transform[3][3]);
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
-            new Light(light_position, color(0,0,0,1), 9),
+            new Light(this.sun_moon_position, yellow, 1000**100),
             new Light(vec4(5.2, 5, 5.2, 1), yellow, 9),
             new Light(vec4(7.5, 5, 5.2, 1), yellow, 9),
             new Light(vec4(5.2, 5, -16.2, 1), yellow, 9),
@@ -215,10 +224,17 @@ export class GriffithScene extends Scene {
             new Light(vec4(-12.5, 5, -15.2, 1), yellow, 9)
         ];
 
-        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
-        let model_transform = Mat4.identity();
+        // create day and night sequence
+            if(this.sun_rise){
+                // simulate daylight
+                this.shapes.sun.draw(context, program_state, sun_moon_transform, this.materials.sun);
+            } else {
+                // simulate nighttime
+                this.shapes.moon.draw(context, program_state, sun_moon_transform, this.materials.moon);
 
-            //Draw the ground and sky
+            }
+
+        //Draw the ground and sky
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
             .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), this.materials.grass);
         this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky);
@@ -253,9 +269,6 @@ export class GriffithScene extends Scene {
         //Create a hill
         let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
         this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
-        
-        // create day and night sequence
-        this.day_night_sequence(context, program_state, t,dt);
 
         // Create trees on platform
             // front and back (camera view)
