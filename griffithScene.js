@@ -22,8 +22,7 @@ export class GriffithScene extends Scene {
             square: new defs.Square(),
             triangle: new defs.Triangle(),
             axes: new defs.Axis_Arrows(),
-            sun: new defs.Subdivision_Sphere(4),
-            moon: new defs.Subdivision_Sphere(4),
+            sun_moon: new defs.Subdivision_Sphere(4),
 
         // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
@@ -53,17 +52,15 @@ export class GriffithScene extends Scene {
                 {ambient: 0.7, diffusivity: 0.5, specularity: 1, color: hex_color("#989292")}),
             lightBulb: new Material(new defs.Phong_Shader(),
                 {ambient: 1, color: hex_color("#bdad07")}),
-            sun:  new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1.0, specularity: 0,color: hex_color("#fcba03")}),
-            moon: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1.0, specularity: 0,color: hex_color("#ffffff")}),
+            sun_moon:  new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1.0, specularity: 0,color: hex_color("#feff05")}),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
+
         this.sun_rise = true;
         this.day_night_interval = 0;
         this.day_night_period = 10;
-        this.sun_moon_position;
     }
 
     change_day_night_period(speed_up) {
@@ -92,6 +89,7 @@ export class GriffithScene extends Scene {
         // period is the duration of day or night
         // i.e. period of 10 => sun cycle lasts 10 seconds and moon cycle lasts 10 seconds
         let theta = 2 * Math.PI / this.day_night_period;
+        let transform = Mat4.identity();
 
         this.day_night_interval += dt;
         if(this.day_night_interval >= this.day_night_period - 0.5) {
@@ -99,23 +97,44 @@ export class GriffithScene extends Scene {
             this.sun_rise = !this.sun_rise;
         }
 
-        let transform = Mat4.identity();
         let x = 200 + 200 * Math.cos(theta* this.day_night_interval);
         let y =   5 + 200 * Math.sin(theta* this.day_night_interval );
         let z_1 = 215 + 190*Math.sin(theta*this.day_night_interval/2);
+        let sky_color_x;
+        let sky_color_y;
+        let sky_color_z;
+        let radius = 0;
+        let sun_moon_color;
 
         if(this.sun_rise){
             // simulate daylight
-            transform = transform.times(Mat4.translation(x,y,z_1)).times(Mat4.scale(5,5,5));
-            //this.shapes.sun.draw(context, program_state, transform, this.materials.sun);
+            sun_moon_color = hex_color("#feff05");
+            radius = 1000**10;
+            sky_color_x = 0.53 - 0.49 * Math.sin(theta* this.day_night_interval/4);
+            sky_color_y = 0.8 - 0.76 * Math.sin(theta* this.day_night_interval/4);
+            sky_color_z = 0.92 - 0.68 * Math.sin(theta* this.day_night_interval/4);
         } else {
             // simulate nighttime
-            transform = transform.times(Mat4.translation(x,y,z_1)).times(Mat4.scale(5,5,5));
-            //this.shapes.moon.draw(context, program_state, transform, this.materials.moon);
+            sun_moon_color = hex_color("#ffffff");
+            // sun_moon_color = hex_color("#d9dbdb");
 
+            radius = 10**8;
+            sky_color_x = 0.04 + 0.49 * Math.sin(theta* this.day_night_interval/4);
+            sky_color_y = 0.04 + 0.76 * Math.sin(theta* this.day_night_interval/4);
+            sky_color_z = 0.24 + 0.68 * Math.sin(theta* this.day_night_interval/4);
         }
 
-        return transform;
+        transform = transform.times(Mat4.translation(x,y,z_1)).times(Mat4.scale(5,5,5));
+        let light_position = vec4(transform[0][3], -transform[1][3], transform[2][3], transform[3][3]);
+        let sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
+
+        return {
+            transform,
+            light_position,
+            radius,
+            sun_moon_color,
+            sky_color
+        };
     }
     display_grass_patches(context, program_state) {
 
@@ -201,13 +220,12 @@ export class GriffithScene extends Scene {
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
 
-        // Calculate sun or moon position
-        let sun_moon_transform = this.day_night_sequence(context, program_state, t,dt);
-        this.sun_moon_position = vec4(sun_moon_transform[0][3], -sun_moon_transform[1][3], sun_moon_transform[2][3], sun_moon_transform[3][3]);
+        // Sun and moon calculations
+        let sun_moon_sequence = this.day_night_sequence(context, program_state, t,dt);
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
-            new Light(this.sun_moon_position, yellow, 1000**100),
+            new Light(sun_moon_sequence.light_position, sun_moon_sequence.sun_moon_color, sun_moon_sequence.radius),
             new Light(vec4(5.2, 5, 5.2, 1), yellow, 9),
             new Light(vec4(7.5, 5, 5.2, 1), yellow, 9),
             new Light(vec4(5.2, 5, -16.2, 1), yellow, 9),
@@ -225,19 +243,13 @@ export class GriffithScene extends Scene {
         ];
 
         // create day and night sequence
-            if(this.sun_rise){
-                // simulate daylight
-                this.shapes.sun.draw(context, program_state, sun_moon_transform, this.materials.sun);
-            } else {
-                // simulate nighttime
-                this.shapes.moon.draw(context, program_state, sun_moon_transform, this.materials.moon);
-
-            }
+        this.shapes.sun_moon.draw(context, program_state, sun_moon_sequence.transform,
+            this.materials.sun_moon.override({color: sun_moon_sequence.sun_moon_color}));
 
         //Draw the ground and sky
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
             .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), this.materials.grass);
-        this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky);
+        this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky.override({color: sun_moon_sequence.sky_color}));
 
         // Create platform for observatory to rest on
         let platform_square_transform = Mat4.identity().times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(20, 30, 3));
