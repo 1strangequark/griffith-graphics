@@ -3,6 +3,8 @@ import {defs, tiny} from './examples/common.js';
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
 } = tiny;
+const SPEED_UP = 1;
+const SLOW_DOWN = -1;
 
 export class GriffithScene extends Scene {
     constructor() {
@@ -60,23 +62,38 @@ export class GriffithScene extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
         this.sun_rise = true;
         this.day_night_interval = 0;
+        this.day_night_period = 10;
+    }
+
+    change_day_night_period(speed_up) {
+        // min is 1
+        if(speed_up == SLOW_DOWN){
+            this.day_night_period += 1;
+
+        } else if(speed_up == SPEED_UP) {
+            if(this.day_night_period >= 2) {
+                this.day_night_period -= 1
+            }
+        }
     }
 
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("Example Command Name", ["Control", "0"], () => this.attached = () => null);
+        this.key_triggered_button("Speed up day/night cycle", ["i"], () => this.change_day_night_period(SPEED_UP));
+        this.key_triggered_button("Slow down day/night cycle", ["Shift", "I"], () => this.change_day_night_period(SLOW_DOWN));
         this.new_line();
+        this.live_string(box => {
+            box.textContent = "Length of day/night: " + (this.day_night_period) + " seconds";
+        });
     }
 
-    day_night_sequence(context, program_state, t,dt, period = 20) {
+    day_night_sequence(context, program_state, t,dt) {
         // period is the duration of day or night
         // i.e. period of 10 => sun cycle lasts 10 seconds and moon cycle lasts 10 seconds
-        let theta = 2 * Math.PI / period;
-        let cameraY = program_state.camera_inverse[1][3];
-        //console.log(cameraY);
-        // console.log(program_state);
+        let theta = 2 * Math.PI / this.day_night_period;
+
         this.day_night_interval += dt;
-        if(this.day_night_interval >= period - 0.5) {
+        if(this.day_night_interval >= this.day_night_period - 0.5) {
             this.day_night_interval = 0;
             this.sun_rise = !this.sun_rise;
         }
@@ -200,8 +217,6 @@ export class GriffithScene extends Scene {
 
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
-        console.log("t:" +t);console.log("dt:" +dt);
-
 
             //Draw the ground and sky
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
