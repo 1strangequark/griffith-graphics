@@ -2,7 +2,7 @@ import {defs, tiny} from './examples/common.js';
 
 const {vec3, unsafe3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene, hex_color} = tiny;
 
-const drop_size = 0.08;
+const drop_size = 0.05;
 
 export class Body {
     constructor(shape, material, size) {
@@ -118,7 +118,7 @@ export class Test_Data {
             text: new Texture("assets/text.png"),
         }
         this.shapes = {
-            ball: new defs.Subdivision_Sphere(1, [[0, 3], [0, 3]]),
+            ball: new defs.Subdivision_Sphere(1),
         };
     }
 
