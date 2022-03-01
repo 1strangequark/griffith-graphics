@@ -152,7 +152,7 @@ function randomRange(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-export class Rain extends Simulation {
+export class Weather extends Simulation {
     constructor() {
         super();
         this.data = new Test_Data();
