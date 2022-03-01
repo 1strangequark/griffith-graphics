@@ -1,6 +1,6 @@
 import {defs, tiny} from './examples/common.js';
 
-const {vec3, unsafe3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene} = tiny;
+const {vec3, unsafe3, vec4, color, Mat4, Light, Shape, Material, Shader, Texture, Scene, hex_color} = tiny;
 
 const drop_size = 0.08;
 
@@ -12,7 +12,6 @@ export class Body {
 
     emplace(location_matrix, linear_velocity, angular_velocity, spin_axis = vec3(0, 0, 0).randomized(1).normalized()) {
         this.center = location_matrix.times(vec4(0, 0, 0, 1)).to3();
-        this.post_impact_time = 0;
         this.rotation = Mat4.translation(...this.center.times(-1)).times(location_matrix);
         this.previous = {center: this.center.copy(), rotation: this.rotation.copy()};
         this.drawn_location = location_matrix;
@@ -139,33 +138,27 @@ export class Rain extends Simulation {
         this.data = new Test_Data();
         this.shapes = Object.assign({}, this.data.shapes);
         this.shapes.square = new defs.Square();
-        const shader = new defs.Fake_Bump_Map(1);
-        this.material = new Material(shader, {
-            color: color(0.6, 0.7, 1, 1),
-            ambient: 0, texture: this.data.textures.stars
-        })
+        this.material = new Material(new defs.Phong_Shader(),
+            {ambient: .4, diffusivity: .6, color: hex_color("#53789e")})
     }
 
     update_state(dt) {
         console.log(dt);
 
-        if(super.rainEnabled) {
-            while (this.bodies.length < 1000)
+        if(super.rainEnabled && this.bodies.length < 1000) {
+            // for loop
+            for (var i=1; i<=20; i++) {
                 this.bodies.push(new Body(this.data.get_droplet(), this.material, vec3(1, 1 + Math.random(), 1))
                     .emplace(Mat4.translation(...vec3(randomRange(-50, 50), 30, randomRange(-50, 50)).randomized(20)),
                         vec3(0, -1, 0).randomized(2).normalized().times(3), Math.random()));
+            }
         }
         for (let b of this.bodies) {
             // Gravity on Earth, where 1 unit in world space = 1 meter:
             b.linear_velocity[1] += dt * -9.8;
-            // If about to fall through floor, reverse y velocity:
-            if (b.center[1] < -8 && b.linear_velocity[1] < 0) {
-                b.linear_velocity[1] *= -.2;
-                b.post_impact_time += dt;
-            }
         }
-        // Delete bodies that stop or stray too far away:
-        this.bodies = this.bodies.filter(b => b.center.norm() < 150 && b.linear_velocity.norm() > 3 && b.post_impact_time < 1);
+        // Delete bodies that fall through the floor:
+        this.bodies = this.bodies.filter(b => !(b.center[1] < -8 && b.linear_velocity[1] < 0));
     }
 
     display(context, program_state) {
