@@ -57,11 +57,20 @@ export class Simulation extends Scene {
     // the simulation from the frame rate (see below).
     constructor() {
         super();
-        Object.assign(this, {time_accumulator: 0, time_scale: 1, rain_enabled: false, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
+        Object.assign(this, {time_accumulator: 0, time_scale: 1, rain_enabled: false, snow_enabled: false, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
     }
 
     get rainEnabled() {
         return this.rain_enabled;
+    }
+    get snowEnabled() {
+        return this.snow_enabled;
+    }
+    setRainEnabled(rain_enabled) {
+        this.rain_enabled = rain_enabled;
+    }
+    setSnowEnabled(snow_enabled) {
+        this.snow_enabled = snow_enabled;
     }
     simulate(frame_time) {
         frame_time = this.time_scale * frame_time;
@@ -78,8 +87,19 @@ export class Simulation extends Scene {
         for (let b of this.bodies) b.blend_state(alpha);
     }
 
+    toggleRain() {
+        this.rain_enabled = !this.rain_enabled;
+        this.snow_enabled = false
+    }
+
+    toggleSnow() {
+        this.snow_enabled = !this.snow_enabled;
+        this.rain_enabled = false
+    }
+
     make_control_panel() {
-        this.key_triggered_button("Toggle Rain", ["t"], () => this.rain_enabled = !this.rain_enabled);
+        this.key_triggered_button("Toggle Rain", ["t"], () => this.toggleRain());
+        this.key_triggered_button("Toggle Snow", ["y"], () => this.toggleSnow());
         this.key_triggered_button("Speed up time", ["Shift", "T"], () => this.time_scale *= 2);
         this.key_triggered_button("Slow down time", ["t"], () => this.time_scale /= 2);
         this.new_line();
@@ -110,19 +130,19 @@ export class Simulation extends Scene {
 
 export class Test_Data {
     constructor() {
-        this.textures = {
-            rgb: new Texture("assets/rgb.jpg"),
-            earth: new Texture("assets/earth.gif"),
-            grid: new Texture("assets/grid.png"),
-            stars: new Texture("assets/stars.png"),
-            text: new Texture("assets/text.png"),
-        }
-        this.shapes = {
+        this.raindrops = {
             ball: new defs.Subdivision_Sphere(1),
+        };
+        this.snowflakes = {
+            square: new defs.Square(),
         };
     }
 
-    get_droplet(shape_list = this.shapes) {
+    get_droplet(shape_list = this.raindrops) {
+        const shape_names = Object.keys(shape_list);
+        return shape_list[shape_names[~~(shape_names.length * Math.random())]]
+    }
+    get_snowflake(shape_list = this.snowflakes) {
         const shape_names = Object.keys(shape_list);
         return shape_list[shape_names[~~(shape_names.length * Math.random())]]
     }
@@ -136,26 +156,38 @@ export class Rain extends Simulation {
     constructor() {
         super();
         this.data = new Test_Data();
-        this.shapes = Object.assign({}, this.data.shapes);
+        this.shapes = Object.assign({}, this.data.raindrops);
         this.shapes.square = new defs.Square();
-        this.material = new Material(new defs.Phong_Shader(),
-            {ambient: .4, diffusivity: .6, color: hex_color("#53789e")})
+        this.waterMaterial = new Material(new defs.Phong_Shader(),
+            {ambient: .8, diffusivity: .6, color: hex_color("#53789e")})
+        this.snowMaterial = new Material(new defs.Phong_Shader(),
+            {ambient: 1, diffusivity: .6, color: hex_color("#FFFFFF")})
     }
 
     update_state(dt) {
         console.log(dt);
-
         if(super.rainEnabled && this.bodies.length < 1000) {
-            // for loop
             for (var i=1; i<=20; i++) {
-                this.bodies.push(new Body(this.data.get_droplet(), this.material, vec3(1, 1 + Math.random(), 1))
+                this.bodies.push(new Body(this.data.get_droplet(), this.waterMaterial, vec3(1, 1 + Math.random(), 1))
+                    .emplace(Mat4.translation(...vec3(randomRange(-50, 50), 30, randomRange(-50, 50)).randomized(20)),
+                        vec3(0, -1, 0).randomized(2).normalized().times(3), Math.random()));
+            }
+        }
+        if(super.snowEnabled && this.bodies.length < 1000) {
+            for (var j=1; j<=20; j++) {
+                this.bodies.push(new Body(this.data.get_snowflake(), this.snowMaterial, vec3(1, 1 + Math.random(), 1))
                     .emplace(Mat4.translation(...vec3(randomRange(-50, 50), 30, randomRange(-50, 50)).randomized(20)),
                         vec3(0, -1, 0).randomized(2).normalized().times(3), Math.random()));
             }
         }
         for (let b of this.bodies) {
             // Gravity on Earth, where 1 unit in world space = 1 meter:
-            b.linear_velocity[1] += dt * -9.8;
+            if (super.snowEnabled) {
+                b.linear_velocity[1] += dt * -0.1;
+            }
+            else {
+                b.linear_velocity[1] += dt * -9.8;
+            }
         }
         // Delete bodies that fall through the floor:
         this.bodies = this.bodies.filter(b => !(b.center[1] < -8 && b.linear_velocity[1] < 0));
