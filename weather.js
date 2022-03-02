@@ -154,7 +154,7 @@ export class Test_Data {
             square: new defs.Square(),
         };
         this.fogcloud = {
-            square: new defs.Subdivision_Sphere(2),
+            cloud: new defs.Subdivision_Sphere(1),
         };
     }
 
@@ -206,11 +206,11 @@ export class Weather extends Simulation {
                         vec3(0, -1, 0).randomized(2).normalized().times(3), Math.random()));
             }
         }
-        // if(super.fogEnabled && this.bodies.length < 1) {
-        //     this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(500, 500, 500))
-        //             .emplace(Mat4.translation(...vec3(randomRange(-15, 15), randomRange(3, 8), randomRange(-15, 10))), 
-        //                      vec3(0, 0, 0), 0, vec3(0, 0, 0).randomized(1).normalized()));
-        // }
+        if(super.fogEnabled && this.bodies.length < 1) {
+            this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(20000, 20000, 20000))
+                    .emplace(Mat4.translation(...vec3(randomRange(-15, 15), randomRange(3, 8), randomRange(-15, 10))), 
+                             vec3(0, 0, 0), 0, vec3(0, 0, 0).randomized(1).normalized()));
+        }
         if(super.fogEnabled && this.bodies.length < 25) {
             for(var k = 0; k < 25; k++) {
                 this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(10 + 50 * Math.random(), 30 * Math.random(), 10 + 50 * Math.random()))
