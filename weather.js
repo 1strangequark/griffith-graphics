@@ -207,8 +207,8 @@ export class Weather extends Simulation {
             }
         }
         if(super.fogEnabled && this.bodies.length < 1) {
-            this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(20000, 20000, 20000))
-                    .emplace(Mat4.translation(...vec3(randomRange(-15, 15), randomRange(3, 8), randomRange(-15, 10))), 
+            this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(5000, 5000, 5000))
+                    .emplace(Mat4.translation(...vec3(0, 0, 0)), 
                              vec3(0, 0, 0), 0, vec3(0, 0, 0).randomized(1).normalized()));
         }
         if(super.fogEnabled && this.bodies.length < 25) {
