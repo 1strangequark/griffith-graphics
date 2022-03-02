@@ -22,7 +22,7 @@ export class GriffithScene extends Scene {
             square: new defs.Square(),
             triangle: new defs.Triangle(),
             axes: new defs.Axis_Arrows(),
-            sun_moon: new defs.Subdivision_Sphere(4),
+            sun: new defs.Subdivision_Sphere(4),
 
         // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
@@ -52,7 +52,7 @@ export class GriffithScene extends Scene {
                 {ambient: 0.7, diffusivity: 0.5, specularity: 1, color: hex_color("#989292")}),
             lightBulb: new Material(new defs.Phong_Shader(),
                 {ambient: 1, color: hex_color("#bdad07")}),
-            sun_moon:  new Material(new defs.Phong_Shader(),
+            sun:  new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0,color: hex_color("#feff05")}),
         }
 
@@ -85,14 +85,14 @@ export class GriffithScene extends Scene {
         });
     }
 
-    day_night_sequence(context, program_state, t,dt) {
+    day_night_sequence(context, program_state, t, dt) {
         // period is the duration of day or night
-        // i.e. period of 10 => sun cycle lasts 10 seconds and moon cycle lasts 10 seconds
+        // i.e. period of 10 => day cycle lasts 10 seconds and night cycle lasts 10 seconds
         let theta = 2 * Math.PI / this.day_night_period;
         let transform = Mat4.identity();
 
         this.day_night_interval += dt;
-        if(this.day_night_interval >= this.day_night_period - 0.5) {
+        if(this.day_night_interval >= this.day_night_period - 0.001) {
             this.day_night_interval = 0;
             this.sun_rise = !this.sun_rise;
         }
@@ -104,35 +104,30 @@ export class GriffithScene extends Scene {
         let sky_color_y;
         let sky_color_z;
         let radius = 0;
-        let sun_moon_color;
 
+        console.log(this.day_night_interval);
         if(this.sun_rise){
             // simulate daylight
-            sun_moon_color = hex_color("#feff05");
             radius = 1000**10;
-            sky_color_x = 0.53 - 0.49 * Math.sin(theta* this.day_night_interval/4);
-            sky_color_y = 0.8 - 0.76 * Math.sin(theta* this.day_night_interval/4);
-            sky_color_z = 0.92 - 0.68 * Math.sin(theta* this.day_night_interval/4);
+            sky_color_x = 0.53 - 0.49 * Math.sin(theta* this.day_night_interval/8);
+            sky_color_y = 0.8 - 0.76 * Math.sin(theta* this.day_night_interval/8);
+            sky_color_z = 0.92 - 0.68 * Math.sin(theta* this.day_night_interval/8);
         } else {
             // simulate nighttime
-            sun_moon_color = hex_color("#ffffff");
-            // sun_moon_color = hex_color("#d9dbdb");
-
-            radius = 10**8;
-            sky_color_x = 0.04 + 0.49 * Math.sin(theta* this.day_night_interval/4);
-            sky_color_y = 0.04 + 0.76 * Math.sin(theta* this.day_night_interval/4);
-            sky_color_z = 0.24 + 0.68 * Math.sin(theta* this.day_night_interval/4);
+            radius = 0;
+            sky_color_x = 0.04 + 0.49 * Math.sin(theta* this.day_night_interval/8);
+            sky_color_y = 0.04 + 0.76 * Math.sin(theta* this.day_night_interval/8);
+            sky_color_z = 0.24 + 0.68 * Math.sin(theta* this.day_night_interval/8);
         }
 
         transform = transform.times(Mat4.translation(x,y,z_1)).times(Mat4.scale(5,5,5));
         let light_position = vec4(transform[0][3], -transform[1][3], transform[2][3], transform[3][3]);
         let sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
-
+        console.log(sky_color);
         return {
             transform,
             light_position,
             radius,
-            sun_moon_color,
             sky_color
         };
     }
@@ -217,15 +212,16 @@ export class GriffithScene extends Scene {
 
         const light_position = vec4(0, 5, 5, 1);
         const yellow = hex_color("#fac91a");
+        const sun_yellow = hex_color("#feff05");
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
 
-        // Sun and moon calculations
-        let sun_moon_sequence = this.day_night_sequence(context, program_state, t,dt);
+        // Day and night cycle calculations
+        let day_night_sequence = this.day_night_sequence(context, program_state, t,dt);
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
-            new Light(sun_moon_sequence.light_position, sun_moon_sequence.sun_moon_color, sun_moon_sequence.radius),
+            new Light(day_night_sequence.light_position, sun_yellow, day_night_sequence.radius),
             new Light(vec4(5.2, 5, 5.2, 1), yellow, 9),
             new Light(vec4(7.5, 5, 5.2, 1), yellow, 9),
             new Light(vec4(5.2, 5, -16.2, 1), yellow, 9),
@@ -243,13 +239,15 @@ export class GriffithScene extends Scene {
         ];
 
         // create day and night sequence
-        this.shapes.sun_moon.draw(context, program_state, sun_moon_sequence.transform,
-            this.materials.sun_moon.override({color: sun_moon_sequence.sun_moon_color}));
+        if(this.sun_rise) {
+            this.shapes.sun.draw(context, program_state, day_night_sequence.transform,
+                this.materials.sun);
+        }
 
         //Draw the ground and sky
         this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
             .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), this.materials.grass);
-        this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky.override({color: sun_moon_sequence.sky_color}));
+        this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky.override({color: day_night_sequence.sky_color}));
 
         // Create platform for observatory to rest on
         let platform_square_transform = Mat4.identity().times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(20, 30, 3));
