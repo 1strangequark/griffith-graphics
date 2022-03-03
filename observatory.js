@@ -30,7 +30,7 @@ export class ObservatoryScene extends Scene {
             light_grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
             concrete: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#cecdcb")}),
+                {ambient: 1, diffusivity: 0.9, specularity: 0, color: hex_color("#c2c0c0")}),
             observatory_roof: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#161c96")}),
             observatory_decoration: new Material(new defs.Phong_Shader(),

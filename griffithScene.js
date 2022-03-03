@@ -40,7 +40,7 @@ export class GriffithScene extends Scene {
             tree_trunk: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#795c34")}),
             concrete: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#dbdbdd")}),
+                {ambient: 0.8, diffusivity: 1, specularity: 0, color: hex_color("#93939b")}),
             sky: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
             lightBase: new Material(new defs.Phong_Shader(),
