@@ -208,15 +208,13 @@ export class Weather extends Simulation {
         }
         if(super.fogEnabled && this.bodies.length < 1) {
             this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(5000, 5000, 5000))
-                    .emplace(Mat4.translation(...vec3(0, 0, 0)), 
+                    .emplace(Mat4.translation(...vec3(15, 15, 15)), 
                              vec3(0, 0, 0), 0, vec3(0, 0, 0).randomized(1).normalized()));
         }
-        if(super.fogEnabled && this.bodies.length < 25) {
-            for(var k = 0; k < 25; k++) {
-                this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(30 + 30 * Math.random(), 10 + 50 * Math.random(), 30 + 30 * Math.random()))
-                        .emplace(Mat4.translation(...vec3(randomRange(-50, 10), randomRange(15, 25), randomRange(-50, 20))), 
-                             vec3(1, 0, 1), 0, vec3(0, 0, 0).randomized(1).normalized()));
-            }
+        if(super.fogEnabled && this.bodies.length < 500) {
+            this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(30 + 30 * Math.random(), 10 + 50 * Math.random(), 30 + 30 * Math.random()))
+                    .emplace(Mat4.translation(...vec3(randomRange(-50, 10), randomRange(15, 50), randomRange(-50, 20))), 
+                         vec3(1, 1, 1), 0, vec3(0, 0, 0).randomized(1).normalized()));
         }
         for (let b of this.bodies) {
             // Gravity on Earth, where 1 unit in world space = 1 meter:
@@ -224,7 +222,7 @@ export class Weather extends Simulation {
                 b.linear_velocity[1] += dt * -0.1;
             }
             else if(super.fogEnabled) {
-                b.linear_velocity[1] = 0;
+                b.linear_velocity[1] -= 0;
             }
             else {
                 b.linear_velocity[1] += dt * -9.8;
@@ -232,6 +230,7 @@ export class Weather extends Simulation {
         }
         // Delete bodies that fall through the floor:
         this.bodies = this.bodies.filter(b => !(b.center[1] < -8 && b.linear_velocity[1] < 0));
+        this.bodies = this.bodies.filter(b => !(b.center[1] <= 14 && super.fogEnabled));
     }
 
     display(context, program_state) {
