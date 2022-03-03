@@ -207,7 +207,7 @@ export class Weather extends Simulation {
             }
         }
         if(super.fogEnabled && this.bodies.length < 1) {
-            this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(5000, 5000, 5000))
+            this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(450, 450, 450))
                     .emplace(Mat4.translation(...vec3(15, 15, 15)), 
                              vec3(0, 0, 0), 0, vec3(0, 0, 0).randomized(1).normalized()));
         }
@@ -223,6 +223,7 @@ export class Weather extends Simulation {
             }
             else if(super.fogEnabled) {
                 b.linear_velocity[1] -= 0;
+                
             }
             else {
                 b.linear_velocity[1] += dt * -9.8;
