@@ -9,6 +9,9 @@ export class GriffithScene extends Scene {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
 
+        this.camera_activity_time = 0;
+        this.camera_activity = "";
+        this.orbit_time = 9;
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
             torus: new defs.Torus(15, 15),
@@ -49,9 +52,16 @@ export class GriffithScene extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
     }
 
+    setCameraActivity(activity) {
+        this.camera_activity = activity;
+        this.camera_activity_time = 0;
+        this.orbit_time = 9;
+    }
+
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("Example Command Name", ["Control", "0"], () => this.attached = () => null);
+        this.key_triggered_button("Free Movement", ["Control", "0"], () => this.setCameraActivity("Start"));
+        this.key_triggered_button("Orbit", ["Control", "0"], () => this.setCameraActivity("Orbit"));
         this.new_line();
     }
 
@@ -173,6 +183,27 @@ export class GriffithScene extends Scene {
 
         //create statue in the courtyard
         this.display_Statue(context,program_state);
+
+        const speed_factor = 0.5;
+        //CAMERA POSITION
+        if (this.camera_activity === "Orbit") {
+            this.orbit_time += dt;
+            let camera_transform = Mat4.identity().times(Mat4.rotation(this.orbit_time * speed_factor, 0, 1, 0)).times(Mat4.translation(0, 15, 60));
+            let camera_position = Mat4.inverse(camera_transform)
+            program_state.camera_inverse = camera_position.map((x, i) =>
+                Vector.from(program_state.camera_inverse[i]).mix(x, 0.05));
+        }
+
+        if (this.camera_activity === "Start") {
+            // var camera_transform = this.initial_camera_location;
+            let start_mat = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
+            program_state.camera_inverse = start_mat.map((x, i) =>
+                Vector.from(program_state.camera_inverse[i]).mix(x, 0.05));
+            this.camera_activity_time += dt;
+            if (this.camera_activity_time > 2) {
+               this.setCameraActivity("");
+            }
+        }
 
         //courtyard light bases
         this.display_courtyard_light_bases(context,program_state, 5.2,5.2);
