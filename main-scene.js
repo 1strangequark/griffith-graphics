@@ -1,5 +1,5 @@
 import {defs, tiny} from './examples/common.js';
-import {Rain} from "./rain.js"
+import {Weather} from "./weather.js"
 import {GriffithScene} from "./griffithScene.js";
 import {Axes_Viewer, Axes_Viewer_Test_Scene} from "./examples/axes-viewer.js"
 import {Collision_Demo, Inertia_Demo} from "./examples/collisions-demo.js"
@@ -29,7 +29,7 @@ const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo;
 
 Object.assign(defs,
     {griffithScene: GriffithScene},
-    {rain: Rain},
+    {weather: Weather},
     {observatory: ObservatoryScene},
     {Axes_Viewer, Axes_Viewer_Test_Scene},
     {Inertia_Demo, Collision_Demo},
@@ -46,6 +46,6 @@ Object.assign(defs,
 // (Can define Main_Scene's class here)
 
 const Main_Scene = GriffithScene;
-const Additional_Scenes = [Rain, ObservatoryScene];
+const Additional_Scenes = [Weather, ObservatoryScene];
 
 export {Main_Scene, Additional_Scenes, Canvas_Widget, Code_Widget, Text_Widget, defs}

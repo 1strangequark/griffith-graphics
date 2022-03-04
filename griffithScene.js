@@ -11,6 +11,9 @@ export class GriffithScene extends Scene {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
 
+        this.camera_activity_time = 0;
+        this.camera_activity = "";
+        this.orbit_time = 9;
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
             torus: new defs.Torus(15, 15),
@@ -32,15 +35,13 @@ export class GriffithScene extends Scene {
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
                 {ambient: .5, diffusivity: .6, color: hex_color("#ffffff")}),
-            test2: new Material(new Gouraud_Shader(),
-                {ambient: .4, diffusivity: .6, color: hex_color("#992828")}),
             grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46")}),
             dark_grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#2f5128")}),
             light_grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
-            tree_leaves: new Material(new Gouraud_Shader(),
+            tree_leaves: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#5aab61")}),
             tree_trunk: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#795c34")}),
@@ -93,6 +94,12 @@ export class GriffithScene extends Scene {
         this.sun.transform = identity.times(Mat4.translation(200,5,215)).times(Mat4.scale(5,5,5));
     }
 
+    setCameraActivity(activity) {
+        this.camera_activity = activity;
+        this.camera_activity_time = 0;
+        this.orbit_time = 9;
+    }
+
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
         this.key_triggered_button("Speed up day/night cycle", ["i"], () => this.change_day_night_period(SPEED_UP));
@@ -101,6 +108,9 @@ export class GriffithScene extends Scene {
         this.live_string(box => {
             box.textContent = "Length of day/night: " + (this.sun.day_night_period) + " seconds";
         });
+        this.new_line();
+        this.key_triggered_button("Free Movement", ["Control", "0"], () => this.setCameraActivity("Start"));
+        this.key_triggered_button("Orbit", ["Control", "0"], () => this.setCameraActivity("Orbit"));
     }
 
     day_night_sequence(context, program_state, t, dt) {
@@ -313,6 +323,27 @@ export class GriffithScene extends Scene {
 
         //create statue in the courtyard
         this.display_Statue(context,program_state);
+
+        const speed_factor = 0.5;
+        //CAMERA POSITION
+        if (this.camera_activity === "Orbit") {
+            this.orbit_time += dt;
+            let camera_transform = Mat4.identity().times(Mat4.rotation(this.orbit_time * speed_factor, 0, 1, 0)).times(Mat4.translation(0, 15, 60));
+            let camera_position = Mat4.inverse(camera_transform)
+            program_state.camera_inverse = camera_position.map((x, i) =>
+                Vector.from(program_state.camera_inverse[i]).mix(x, 0.05));
+        }
+
+        if (this.camera_activity === "Start") {
+            // var camera_transform = this.initial_camera_location;
+            let start_mat = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
+            program_state.camera_inverse = start_mat.map((x, i) =>
+                Vector.from(program_state.camera_inverse[i]).mix(x, 0.05));
+            this.camera_activity_time += dt;
+            if (this.camera_activity_time > 2) {
+               this.setCameraActivity("");
+            }
+        }
 
         //courtyard light bases
         this.display_courtyard_light_bases(context,program_state, 5.2,5.2);
