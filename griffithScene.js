@@ -58,21 +58,39 @@ export class GriffithScene extends Scene {
 
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
 
-        this.sun_rise = true;
-        this.day_night_interval = 0;
-        this.day_night_period = 10;
+        this.sun = {
+            sun_rise: true,
+            day_night_interval: 0,
+            day_night_period: 10,
+            max_day_night_interval: 0,
+            track_transition: 0,
+            max_interval: 10.5,
+            transition: 1,
+            max_day_interval: 10.5 * 2,
+            theta : Math.PI / 10,
+            transform: Mat4.identity(),
+        }
     }
 
     change_day_night_period(speed_up) {
         // min is 1
         if(speed_up == SLOW_DOWN){
-            this.day_night_period += 1;
-
+            this.sun.day_night_period += 1;
         } else if(speed_up == SPEED_UP) {
-            if(this.day_night_period >= 2) {
-                this.day_night_period -= 1
+            if(this.sun.day_night_period >= 2) {
+                this.sun.day_night_period -= 1
             }
         }
+
+        this.sun.max_interval = this.sun.day_night_period + (0.05 * this.sun.day_night_period);
+        this.sun.transition = this.sun.day_night_period / 10;
+        this.sun.max_day_interval = this.sun.max_interval * 2;
+        this.sun.track_transition =0;
+        this.sun.day_night_interval = 0;
+        this.sun.max_day_night_interval = 0;
+        this.sun.theta =  Math.PI / this.sun.day_night_period;
+        let identity = Mat4.identity();
+        this.sun.transform = identity.times(Mat4.translation(200,5,215)).times(Mat4.scale(5,5,5));
     }
 
     make_control_panel() {
@@ -81,51 +99,88 @@ export class GriffithScene extends Scene {
         this.key_triggered_button("Slow down day/night cycle", ["Shift", "I"], () => this.change_day_night_period(SLOW_DOWN));
         this.new_line();
         this.live_string(box => {
-            box.textContent = "Length of day/night: " + (this.day_night_period) + " seconds";
+            box.textContent = "Length of day/night: " + (this.sun.day_night_period) + " seconds";
         });
     }
 
     day_night_sequence(context, program_state, t, dt) {
         // period is the duration of day or night
         // i.e. period of 10 => day cycle lasts 10 seconds and night cycle lasts 10 seconds
-        let theta = 2 * Math.PI / this.day_night_period;
+        this.sun.theta = Math.PI / this.sun.day_night_period;
         let transform = Mat4.identity();
 
-        this.day_night_interval += dt;
-        if(this.day_night_interval >= this.day_night_period - 0.001) {
-            this.day_night_interval = 0;
-            this.sun_rise = !this.sun_rise;
+        this.sun.day_night_interval += dt;
+        this.sun.max_day_night_interval += dt;
+
+        if (this.sun.day_night_interval >= this.sun.max_interval) {
+            this.sun.day_night_interval = 0;
+            this.sun.sun_rise = !this.sun.sun_rise;
         }
 
-        let x = 200 + 200 * Math.cos(theta* this.day_night_interval);
-        let y =   5 + 200 * Math.sin(theta* this.day_night_interval );
-        let z_1 = 215 + 190*Math.sin(theta*this.day_night_interval/2);
-        let sky_color_x;
-        let sky_color_y;
-        let sky_color_z;
+        if (this.sun.max_day_night_interval >= this.sun.max_day_interval) {
+            this.sun.max_day_night_interval = 0;
+        }
+
+        let x = 200 + 200 * Math.cos(this.sun.theta * this.sun.day_night_interval);
+        let y = 5 + 200 * Math.sin(this.sun.theta * this.sun.day_night_interval);
+        let z_1 = 215 + 190 * Math.sin(this.sun.theta * this.sun.day_night_interval / 2);
+        let sky_color_x, sky_color_y, sky_color_z;
+        let sky_color;
         let radius = 0;
-
-        console.log(this.day_night_interval);
-        if(this.sun_rise){
-            // simulate daylight
-            radius = 1000**10;
-            sky_color_x = 0.53 - 0.49 * Math.sin(theta* this.day_night_interval/8);
-            sky_color_y = 0.8 - 0.76 * Math.sin(theta* this.day_night_interval/8);
-            sky_color_z = 0.92 - 0.68 * Math.sin(theta* this.day_night_interval/8);
-        } else {
-            // simulate nighttime
+        if (this.sun.sun_rise)
+            radius = 1000 ** 10;
+        else
             radius = 0;
-            sky_color_x = 0.04 + 0.49 * Math.sin(theta* this.day_night_interval/8);
-            sky_color_y = 0.04 + 0.76 * Math.sin(theta* this.day_night_interval/8);
-            sky_color_z = 0.24 + 0.68 * Math.sin(theta* this.day_night_interval/8);
+
+        if ((this.sun.max_day_night_interval < this.sun.max_interval + this.sun.transition * 2) && (this.sun.max_day_night_interval > this.sun.max_interval - this.sun.transition / 2)) {
+            // sunset
+            this.sun.track_transition += dt;
+            sky_color_x = 0.59 - 0.51 * Math.sin((Math.PI / (this.sun.transition * 5)) * this.sun.track_transition);
+            sky_color_y = 0.76 - 0.52 * Math.sin((Math.PI / (this.sun.transition * 5)) * this.sun.track_transition);
+            sky_color_z = 0.94 - 0.55 * Math.sin((Math.PI / (this.sun.transition * 5)) * this.sun.track_transition);
+
+            if (this.sun.track_transition >= (this.sun.transition * 5) / 2)
+                sky_color = color(0.08, 0.24, 0.39, 1);
+            else
+                sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
+
+        } else if (this.sun.max_day_night_interval < this.sun.transition) {
+            // end of sunrise
+            this.sun.track_transition = 0;
+            sky_color_x = 0.18 + 0.41 * Math.sin((Math.PI / (this.sun.transition * 2)) * this.sun.max_day_night_interval);
+            sky_color_y = 0.50 + 0.26 * Math.sin((Math.PI / (this.sun.transition * 2)) * this.sun.max_day_night_interval);
+            sky_color_z = 0.66 + 0.28 * Math.sin((Math.PI / (this.sun.transition * 2)) * this.sun.max_day_night_interval);
+
+            if (this.sun.track_transition >= this.sun.transition)
+                sky_color = color(0.59, 0.76, 0.94, 1);
+            else
+                sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
+
+        } else if (this.sun.max_day_night_interval > this.sun.max_day_interval - this.sun.transition / 3) {
+            // beginning of sunrise
+            this.sun.track_transition += dt;
+            sky_color_x = 0.08 + 0.10 * Math.sin((Math.PI / (this.sun.transition * 2)) * this.sun.track_transition);
+            sky_color_y = 0.24 + 0.26 * Math.sin((Math.PI / (this.sun.transition * 2)) * this.sun.track_transition);
+            sky_color_z = 0.39 + 0.27 * Math.sin((Math.PI / (this.sun.transition * 2)) * this.sun.track_transition);
+
+            if (this.sun.track_transition >= this.sun.transition)
+                sky_color = color(0.08, 0.24, 0.39, 1);
+            else
+                sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
+
+        } else {
+            this.sun.track_transition = 0;
+
+            if (this.sun.sun_rise)
+                sky_color = color(0.59, 0.76, 0.94, 1);
+            else
+                sky_color = color(0.08, 0.24, 0.39, 1);
         }
 
-        transform = transform.times(Mat4.translation(x,y,z_1)).times(Mat4.scale(5,5,5));
-        let light_position = vec4(transform[0][3], -transform[1][3], transform[2][3], transform[3][3]);
-        let sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
-        console.log(sky_color);
+        this.sun.transform = transform.times(Mat4.translation(x, y, z_1)).times(Mat4.scale(5, 5, 5));
+        let light_position = vec4(this.sun.transform[0][3], -this.sun.transform[1][3], this.sun.transform[2][3], this.sun.transform[3][3]);
+
         return {
-            transform,
             light_position,
             radius,
             sky_color
@@ -239,8 +294,8 @@ export class GriffithScene extends Scene {
         ];
 
         // create day and night sequence
-        if(this.sun_rise) {
-            this.shapes.sun.draw(context, program_state, day_night_sequence.transform,
+        if(this.sun.sun_rise) {
+            this.shapes.sun.draw(context, program_state, this.sun.transform,
                 this.materials.sun);
         }
 
