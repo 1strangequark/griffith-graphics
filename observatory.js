@@ -169,7 +169,6 @@ export class ObservatoryScene extends Scene {
         this.shapes.cylinder.draw(context, program_state, cylinder_1_transform.times(Mat4.scale(1.1,1.1,0.9)), this.materials.concrete);
 
 
-
         let small_dome_separation = 6;
         let cylinder_2_transform = cylinder_1_transform.times(Mat4.scale(0.4, 0.4, 0.8)).times(Mat4.translation(small_dome_separation, -5, 0));
 
@@ -185,10 +184,12 @@ export class ObservatoryScene extends Scene {
         let lower_left_wall_transform = left_wall_transform.times(Mat4.translation(0, -5, 0));
         let right_wall_transform = left_wall_transform.times(Mat4.translation(-3, 0, 0));
         let lower_right_wall_transform = right_wall_transform.times(Mat4.translation(0, -5, 0));
+
         this.shapes.cube.draw(context, program_state, left_wall_transform, this.materials.concrete);
         this.shapes.cube.draw(context, program_state, lower_left_wall_transform, this.materials.concrete);
         this.shapes.cube.draw(context, program_state, right_wall_transform, this.materials.concrete);
         this.shapes.cube.draw(context, program_state, lower_right_wall_transform, this.materials.concrete);
+
         this.display_windows(context, program_state);
         this.display_entryway(context, program_state);
         this.display_roofs(context, program_state);
