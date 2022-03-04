@@ -164,12 +164,23 @@ export class ObservatoryScene extends Scene {
             Math.PI / 4, context.width / context.height, .1, 1000);
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let cylinder_1_transform = Mat4.identity().times(Mat4.translation(0, 3, 25)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(6, 6, 10));
-        this.shapes.cylinder.draw(context, program_state, cylinder_1_transform, this.materials.concrete);
+
+        this.shapes.cylinder.draw(context, program_state, cylinder_1_transform, this.materials.concrete2);
+        this.shapes.cylinder.draw(context, program_state, cylinder_1_transform.times(Mat4.scale(1.1,1.1,0.9)), this.materials.concrete);
+
+
+
         let small_dome_separation = 6;
         let cylinder_2_transform = cylinder_1_transform.times(Mat4.scale(0.4, 0.4, 0.8)).times(Mat4.translation(small_dome_separation, -5, 0));
-        this.shapes.cylinder.draw(context, program_state, cylinder_2_transform, this.materials.concrete);
+
+        this.shapes.cylinder.draw(context, program_state, cylinder_2_transform, this.materials.concrete2);
+        this.shapes.cylinder.draw(context, program_state, cylinder_2_transform.times(Mat4.scale(1.1,1.1,0.9)), this.materials.concrete);
+
         let cylinder_3_transform = cylinder_2_transform.times(Mat4.translation(-2.0 * small_dome_separation, 0, 0))
-        this.shapes.cylinder.draw(context, program_state, cylinder_3_transform, this.materials.concrete);
+
+        this.shapes.cylinder.draw(context, program_state, cylinder_3_transform, this.materials.concrete2);
+        this.shapes.cylinder.draw(context, program_state, cylinder_3_transform.times(Mat4.scale(1.1,1.1,0.9)), this.materials.concrete);
+
         let left_wall_transform = Mat4.identity().times(Mat4.translation(8, 6, 13).times(Mat4.scale(5.5,.5,2)));
         let lower_left_wall_transform = left_wall_transform.times(Mat4.translation(0, -5, 0));
         let right_wall_transform = left_wall_transform.times(Mat4.translation(-3, 0, 0));
