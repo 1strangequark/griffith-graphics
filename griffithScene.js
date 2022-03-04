@@ -387,6 +387,7 @@ export class GriffithScene extends Scene {
         this.display_tree(context, program_state, 4, 0, -9, 1);
     }
 }
+
 class Gouraud_Shader extends Shader {
     // This is a Shader using Phong_Shader as template
 
@@ -433,7 +434,6 @@ class Gouraud_Shader extends Shader {
                 float diffuse  =      max( dot( N, L ), 0.0 );
                 float specular = pow( max( dot( N, H ), 0.0 ), smoothness );
                 float attenuation = 1.0 / (1.0 + light_attenuation_factors[i] * distance_to_light * distance_to_light );
-
                 vec3 light_contribution = shape_color.xyz * light_colors[i].xyz * diffusivity * diffuse
                                                           + light_colors[i].xyz * specularity * specular;
                 result += attenuation * light_contribution;
