@@ -57,7 +57,8 @@ export class Simulation extends Scene {
     // the simulation from the frame rate (see below).
     constructor() {
         super();
-        Object.assign(this, {time_accumulator: 0, time_scale: 1, rain_enabled: false, snow_enabled: false, t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
+        Object.assign(this, {time_accumulator: 0, time_scale: 1, rain_enabled: false, snow_enabled: false, fog_enabled: false, 
+                             t: 0, dt: 1 / 20, bodies: [], steps_taken: 0});
     }
 
     get rainEnabled() {
@@ -66,11 +67,17 @@ export class Simulation extends Scene {
     get snowEnabled() {
         return this.snow_enabled;
     }
+    get fogEnabled() {
+        return this.fog_enabled;
+    }
     setRainEnabled(rain_enabled) {
         this.rain_enabled = rain_enabled;
     }
     setSnowEnabled(snow_enabled) {
         this.snow_enabled = snow_enabled;
+    }
+    setFogEnabled(fog_enabled) {
+        this.fog_enabled = fog_enabled;
     }
     simulate(frame_time) {
         frame_time = this.time_scale * frame_time;
@@ -89,17 +96,26 @@ export class Simulation extends Scene {
 
     toggleRain() {
         this.rain_enabled = !this.rain_enabled;
-        this.snow_enabled = false
+        this.snow_enabled = false;
+        this.fog_enabled = false;
     }
 
     toggleSnow() {
         this.snow_enabled = !this.snow_enabled;
-        this.rain_enabled = false
+        this.rain_enabled = false;
+        this.fog_enabled = false;
+    }
+
+    toggleFog() {
+        this.fog_enabled = !this.fog_enabled;
+        this.snow_enabled = false;
+        this.rain_enabled = false;
     }
 
     make_control_panel() {
         this.key_triggered_button("Toggle Rain", ["t"], () => this.toggleRain());
         this.key_triggered_button("Toggle Snow", ["y"], () => this.toggleSnow());
+        this.key_triggered_button("Toggle Fog", ["u"], () => this.toggleFog());
         this.key_triggered_button("Speed up time", ["Shift", "T"], () => this.time_scale *= 2);
         this.key_triggered_button("Slow down time", ["t"], () => this.time_scale /= 2);
         this.new_line();
@@ -119,6 +135,7 @@ export class Simulation extends Scene {
     display(context, program_state) {
         if (program_state.animate)
             this.simulate(program_state.animation_delta_time);
+        
         for (let b of this.bodies)
             b.shape.draw(context, program_state, b.drawn_location, b.material);
     }
@@ -136,6 +153,9 @@ export class Test_Data {
         this.snowflakes = {
             square: new defs.Square(),
         };
+        this.fogcloud = {
+            cloud: new defs.Subdivision_Sphere(4),
+        };
     }
 
     get_droplet(shape_list = this.raindrops) {
@@ -143,6 +163,10 @@ export class Test_Data {
         return shape_list[shape_names[~~(shape_names.length * Math.random())]]
     }
     get_snowflake(shape_list = this.snowflakes) {
+        const shape_names = Object.keys(shape_list);
+        return shape_list[shape_names[~~(shape_names.length * Math.random())]]
+    }
+    get_fogcloud(shape_list = this.fogcloud) {
         const shape_names = Object.keys(shape_list);
         return shape_list[shape_names[~~(shape_names.length * Math.random())]]
     }
@@ -161,7 +185,9 @@ export class Weather extends Simulation {
         this.waterMaterial = new Material(new defs.Phong_Shader(),
             {ambient: .8, diffusivity: .6, color: hex_color("#53789e")})
         this.snowMaterial = new Material(new defs.Phong_Shader(),
-            {ambient: 1, diffusivity: .6, color: hex_color("#FFFFFF")})
+            {ambient: 1, diffusivity: .6, color: hex_color("#FFFFFF")}),
+        this.fogMaterial = new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 0, color: hex_color("D3D3D3", 0.2)})
     }
 
     update_state(dt) {
@@ -180,10 +206,18 @@ export class Weather extends Simulation {
                         vec3(0, -1, 0).randomized(2).normalized().times(3), Math.random()));
             }
         }
+        if(super.fogEnabled && this.bodies.length < 1) {
+            this.bodies.push(new Body(this.data.get_fogcloud(), this.fogMaterial, vec3(1500, 1500, 1500))
+                    .emplace(Mat4.translation(...vec3(0, 0, 0)), 
+                             vec3(0, 0, 0), 0, vec3(0, 0, 0).randomized(1).normalized()));
+        }
         for (let b of this.bodies) {
             // Gravity on Earth, where 1 unit in world space = 1 meter:
             if (super.snowEnabled) {
                 b.linear_velocity[1] += dt * -0.1;
+            }
+            else if(super.fogEnabled) {
+                b.linear_velocity[1] -= 0;
             }
             else {
                 b.linear_velocity[1] += dt * -9.8;
@@ -196,6 +230,7 @@ export class Weather extends Simulation {
     display(context, program_state) {
         // display(): Draw everything else in the scene besides the moving bodies.
         super.display(context, program_state);
+        
 
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
