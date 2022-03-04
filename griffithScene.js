@@ -387,7 +387,6 @@ export class GriffithScene extends Scene {
         this.display_tree(context, program_state, 4, 0, -9, 1);
     }
 }
-
 class Gouraud_Shader extends Shader {
     // This is a Shader using Phong_Shader as template
 
