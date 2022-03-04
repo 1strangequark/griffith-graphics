@@ -31,6 +31,8 @@ export class ObservatoryScene extends Scene {
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
             concrete: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0.9, specularity: 0, color: hex_color("#c2c0c0")}),
+            concrete2: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 0.9, specularity: 0, color: hex_color("#868686")}),
             observatory_roof: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#161c96")}),
             observatory_decoration: new Material(new defs.Phong_Shader(),
@@ -67,15 +69,63 @@ export class ObservatoryScene extends Scene {
         }
     }
 
+    display_frontWall_columns(context, program_state)
+    {
+        //Right Hand Vertical Columns
+        let column1_transform = Mat4.identity().times(Mat4.translation(5, 4.3, 11.7).times(Mat4.scale(0.40,2,1)));
+        let column2_transform = Mat4.identity().times(Mat4.translation(7, 4.3, 11.7).times(Mat4.scale(0.40,2,1)));
+        let column3_transform = Mat4.identity().times(Mat4.translation(9, 4.3, 11.7).times(Mat4.scale(0.40,2,1)));
+        let column4_transform = Mat4.identity().times(Mat4.translation(11, 4.3, 11.7).times(Mat4.scale(0.40,2,1)));
+
+        this.shapes.cube.draw(context, program_state, column1_transform, this.materials.concrete2);
+        this.shapes.cube.draw(context, program_state, column2_transform, this.materials.concrete2);
+        this.shapes.cube.draw(context, program_state, column3_transform, this.materials.concrete2);
+        this.shapes.cube.draw(context, program_state, column4_transform, this.materials.concrete2);
+
+        //Left hand Vertical Columns
+        let column5_transform = Mat4.identity().times(Mat4.translation(-5.5, 4.3, 11.7).times(Mat4.scale(0.40,2,1)));
+        let column6_transform = Mat4.identity().times(Mat4.translation(-7.5, 4.3, 11.7).times(Mat4.scale(0.40,2,1)));
+        let column7_transform = Mat4.identity().times(Mat4.translation(-9.5, 4.3, 11.7).times(Mat4.scale(0.40,2,1)));
+        let column8_transform = Mat4.identity().times(Mat4.translation(-11.5, 4.3, 11.7).times(Mat4.scale(0.40,2,1)));
+
+        this.shapes.cube.draw(context, program_state, column5_transform, this.materials.concrete2);
+        this.shapes.cube.draw(context, program_state, column6_transform, this.materials.concrete2);
+        this.shapes.cube.draw(context, program_state, column7_transform, this.materials.concrete2);
+        this.shapes.cube.draw(context, program_state, column8_transform, this.materials.concrete2);
+
+        //Right Hand Horizontal column
+        let column9_transform = Mat4.identity().times(Mat4.translation(8, 6.5, 10.9).times(Mat4.scale(5,0.30,0.15)));
+        this.shapes.cube.draw(context, program_state, column9_transform, this.materials.concrete2);
+
+
+        //Left Hand Horizontal column
+        let column10_transform = Mat4.identity().times(Mat4.translation(-8.5, 6.5, 10.9).times(Mat4.scale(5,0.30,0.15)));
+        this.shapes.cube.draw(context, program_state, column10_transform, this.materials.concrete2);
+
+    }
+
     display_entryway(context, program_state) {
-        let left_doorway_transform = Mat4.identity().times(Mat4.translation(2, 4, 13).times(Mat4.scale(0.5,2,2)));
-        this.shapes.cube.draw(context, program_state, left_doorway_transform, this.materials.concrete);
-        let right_doorway_transform = Mat4.identity().times(Mat4.translation(-2.5, 4, 13).times(Mat4.scale(0.5,2,2)));
-        this.shapes.cube.draw(context, program_state, right_doorway_transform, this.materials.concrete);
-        let entryway_top = Mat4.identity().times(Mat4.translation(-0.25, 6.25, 13).times(Mat4.scale(3,.25,2)));
+
+        let ycoord = 3.65;
+        let zcoord = 10.75;
+
+        let left_doorway_transform = Mat4.identity().times(Mat4.translation(2, 4, 12).times(Mat4.scale(0.5,2,2)));
+        this.shapes.cube.draw(context, program_state, left_doorway_transform, this.materials.concrete2);
+        let right_doorway_transform = Mat4.identity().times(Mat4.translation(-2.5, 4, 12).times(Mat4.scale(0.5,2,2)));
+        this.shapes.cube.draw(context, program_state, right_doorway_transform, this.materials.concrete2);
+        let entryway_top = Mat4.identity().times(Mat4.translation(-0.25, 6.25, 12).times(Mat4.scale(3,.25,2)));
         this.shapes.cube.draw(context, program_state, entryway_top, this.materials.concrete);
-        let entryway_bottom = Mat4.identity().times(Mat4.translation(-0.25, 3.25, 13).times(Mat4.scale(3,.25,2)));
+        let entryway_bottom = Mat4.identity().times(Mat4.translation(-0.25, 3.25, 13).times(Mat4.scale(3,.45,2)));
         this.shapes.cube.draw(context, program_state, entryway_bottom, this.materials.concrete);
+        //drawing doorway stairs
+        let doorWayStairTransform = Mat4.identity();
+        for (let i = 0; i < 7 ; i++)
+        {
+            this.shapes.cube.draw(context, program_state, doorWayStairTransform.times(Mat4.translation(-0.25,ycoord,zcoord)).times(Mat4.scale(3.75,0.08,2)), this.materials.concrete2);
+            ycoord = ycoord - 0.10;
+            zcoord = zcoord - 0.25;
+        }
+
     }
 
     display_roofs(context, program_state) {
@@ -88,6 +138,7 @@ export class ObservatoryScene extends Scene {
         let roof_3_transform = roof_2_transform.times(Mat4.translation(-2.0 * roof_separation, 0, 0))
         this.shapes.sphere.draw(context, program_state, roof_3_transform, this.materials.observatory_roof);
     }
+
 
     display_building_body (context, program_state) {
         let building_center_transform = Mat4.identity().times(Mat4.translation(0, 4.5, 21)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(5, 6, 2));
@@ -131,5 +182,7 @@ export class ObservatoryScene extends Scene {
         this.display_entryway(context, program_state);
         this.display_roofs(context, program_state);
         this.display_building_body(context, program_state);
+        this.display_frontWall_columns(context, program_state);
+
     }
 }

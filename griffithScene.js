@@ -18,6 +18,7 @@ export class GriffithScene extends Scene {
             torus2: new defs.Torus(3, 15),
             sphere: new defs.Subdivision_Sphere(2),
             sphere2: new defs.Subdivision_Sphere(4),
+            sphere3: new defs.Subdivision_Sphere(1),
             circle: new defs.Regular_2D_Polygon(1, 30),
             cube: new defs.Cube(),
             square: new defs.Square(),
@@ -47,6 +48,8 @@ export class GriffithScene extends Scene {
                 {ambient: 0.7, diffusivity: 0.5, specularity: 1, color: hex_color("#989292")}),
             lightBulb: new Material(new defs.Phong_Shader(),
                 {ambient: 1, color: hex_color("#bdad07")}),
+            bushBase: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d3206")}),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
@@ -72,6 +75,9 @@ export class GriffithScene extends Scene {
         let platform_grass_transform3 = platform_grass_transform.times(Mat4.translation(-2.4, 0, 0));
         let platform_grass_transform4 = platform_grass_transform2.times(Mat4.translation(-2.4, 0, 0));
         let platform_grass_transform5 = platform_grass_transform.times(Mat4.translation(-6.5, -1, 0)).times(Mat4.scale(2.5, 2, 2));
+        let platform_grass_transform6 = platform_grass_transform.times(Mat4.translation(-6.25, 2, 0)).times(Mat4.scale(1.4, 0.15, 2));
+        let platform_grass_transform7 = platform_grass_transform.times(Mat4.translation(-0.50, 2, 0)).times(Mat4.scale(1.4, 0.15, 2));
+
 
         let material = this.materials.light_grass;
         this.shapes.square.draw(context, program_state, platform_grass_transform, material);
@@ -79,6 +85,10 @@ export class GriffithScene extends Scene {
         this.shapes.square.draw(context, program_state, platform_grass_transform3, material);
         this.shapes.square.draw(context, program_state, platform_grass_transform4, material);
         this.shapes.square.draw(context, program_state, platform_grass_transform5, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform6, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform7, material);
+
+
 
     }
     
@@ -129,8 +139,36 @@ export class GriffithScene extends Scene {
         this.shapes.sphere2.draw(context, program_state,platform_light_transform4, this.materials.lightBulb);
 
     }
+    display_Entry_bushes(context, program_state)
+    {
+        let bush_transform1 = Mat4.identity().times(Mat4.translation(2.0,5,9.2)).times(Mat4.scale(0.25,1.25,0.25));
+        let bush_transform2 = Mat4.identity().times(Mat4.translation(-2.4,5,9.2)).times(Mat4.scale(0.25,1.25,0.25));
 
-        display(context, program_state) {
+        this.shapes.sphere3.draw(context, program_state,bush_transform1, this.materials.dark_grass);
+        this.shapes.sphere3.draw(context, program_state,bush_transform2, this.materials.dark_grass);
+        this.shapes.cube.draw(context, program_state,bush_transform1.times(Mat4.scale(1,0.15,1)).times(Mat4.translation(0,-5,0)), this.materials.bushBase);
+        this.shapes.cube.draw(context, program_state,bush_transform2.times(Mat4.scale(1,0.15,1)).times(Mat4.translation(0,-5,0)), this.materials.bushBase);
+    }
+
+    display_Side_bushes(context, program_state)
+    {
+        let bush_transform1 = Mat4.identity().times(Mat4.translation(6.0,3.8,9.9)).times(Mat4.scale(0.35,0.9,0.35));
+        let bush_transform2 = Mat4.identity().times(Mat4.translation(10.0,3.8,9.9)).times(Mat4.scale(0.35,0.9,0.35));
+
+        let bush_transform3 = Mat4.identity().times(Mat4.translation(-6.4,3.8,9.9)).times(Mat4.scale(0.35,0.9,0.35));
+        let bush_transform4 = Mat4.identity().times(Mat4.translation(-10.4,3.8,9.9)).times(Mat4.scale(0.35,0.9,0.35));
+
+        this.shapes.sphere3.draw(context, program_state,bush_transform1, this.materials.dark_grass);
+        this.shapes.sphere3.draw(context, program_state,bush_transform2, this.materials.dark_grass);
+        this.shapes.sphere3.draw(context, program_state,bush_transform3, this.materials.dark_grass);
+        this.shapes.sphere3.draw(context, program_state,bush_transform4, this.materials.dark_grass);
+
+
+    }
+
+
+
+    display(context, program_state) {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
@@ -220,6 +258,10 @@ export class GriffithScene extends Scene {
         this.display_courtyard_light_bases(context,program_state, -12.5,5.2);
         this.display_courtyard_light_bases(context,program_state, -5.2,-15.2);
         this.display_courtyard_light_bases(context,program_state, -12.5,-15.2);
+
+        this.display_Entry_bushes(context,program_state);
+        this.display_Side_bushes(context, program_state);
+
 
 
         //Create a hill
