@@ -11,6 +11,7 @@ export class GriffithScene extends Scene {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
 
+        this.turn_on_lights = false;
         this.camera_activity_time = 0;
         this.camera_activity = "";
         this.orbit_time = 9;
@@ -156,6 +157,7 @@ export class GriffithScene extends Scene {
                 sky_color = color(0.08, 0.24, 0.39, 1);
             else
                 sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
+            this.turn_on_lights = true;
 
         } else if (this.sun.max_day_night_interval < this.sun.transition) {
             // end of sunrise
@@ -168,6 +170,7 @@ export class GriffithScene extends Scene {
                 sky_color = color(0.59, 0.76, 0.94, 1);
             else
                 sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
+            this.turn_on_lights = false;
 
         } else if (this.sun.max_day_night_interval > this.sun.max_day_interval - this.sun.transition / 3) {
             // beginning of sunrise
@@ -422,7 +425,9 @@ export class GriffithScene extends Scene {
         let day_night_sequence = this.day_night_sequence(context, program_state, t,dt);
 
         // The parameters of the Light are: position, color, size
-        program_state.lights = [
+        if (this.turn_on_lights)
+        {
+            program_state.lights = [
             new Light(day_night_sequence.light_position, sun_yellow, day_night_sequence.radius),
             //courtyard Lights
             new Light(vec4(5.2, 5, 5.2, 1), yellow, 9),
@@ -444,10 +449,32 @@ export class GriffithScene extends Scene {
             new Light(vec4(-215, 34, -7, 1), yellow, 1000),
             new Light(vec4(-215, 30, -25, 1), yellow, 1000),
             new Light(vec4(-200, 35, -45, 1), yellow, 1000),
-
-
-
+            ];
+        } else {
+            program_state.lights = [
+            new Light(day_night_sequence.light_position, sun_yellow, day_night_sequence.radius),
+            //courtyard Lights
+            new Light(vec4(5.2, 5, 5.2, 1), yellow, 0),
+            new Light(vec4(7.5, 5, 5.2, 1), yellow, 0),
+            new Light(vec4(5.2, 5, -16.2, 1), yellow, 0),
+            new Light(vec4(7.5, 5, -16.2, 1), yellow, 0),
+            new Light(vec4(13.2, 5, -11.2, 1), yellow, 0),
+            new Light(vec4(13.2, 5, 0.2, 1), yellow, 0),
+            new Light(vec4(-0.45, 5, -11.2, 1), yellow, 0),
+            new Light(vec4(-0.45, 5, 0.2, 1), yellow, 0),
+            new Light(vec4(-17.2, 5, -11.2, 1), yellow, 0),
+            new Light(vec4(-17.2, 5, 0.2, 1), yellow, 0),
+            new Light(vec4(-5.2, 5, 5.2, 1), yellow, 0),
+            new Light(vec4(-12.5, 5, 5.2, 1), yellow, 0),
+            new Light(vec4(-5.2, 5, -15.2, 1), yellow, 0),
+            new Light(vec4(-12.5, 5, -15.2, 1), yellow, 0),
+            //Hollywood Lights
+            new Light(vec4(-215, 30, 22, 1), yellow, 1000),
+            new Light(vec4(-215, 34, -7, 1), yellow, 1000),
+            new Light(vec4(-215, 30, -25, 1), yellow, 1000),
+            new Light(vec4(-200, 35, -45, 1), yellow, 1000),
         ];
+        }
 
         // create day and night sequence
         if(this.sun.sun_rise) {
