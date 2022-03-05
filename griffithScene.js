@@ -424,6 +424,7 @@ export class GriffithScene extends Scene {
         // The parameters of the Light are: position, color, size
         program_state.lights = [
             new Light(day_night_sequence.light_position, sun_yellow, day_night_sequence.radius),
+            //courtyard Lights
             new Light(vec4(5.2, 5, 5.2, 1), yellow, 9),
             new Light(vec4(7.5, 5, 5.2, 1), yellow, 9),
             new Light(vec4(5.2, 5, -16.2, 1), yellow, 9),
@@ -437,7 +438,15 @@ export class GriffithScene extends Scene {
             new Light(vec4(-5.2, 5, 5.2, 1), yellow, 9),
             new Light(vec4(-12.5, 5, 5.2, 1), yellow, 9),
             new Light(vec4(-5.2, 5, -15.2, 1), yellow, 9),
-            new Light(vec4(-12.5, 5, -15.2, 1), yellow, 9)
+            new Light(vec4(-12.5, 5, -15.2, 1), yellow, 9),
+            //Hollywood Lights
+            new Light(vec4(-215, 30, 22, 1), yellow, 1000),
+            new Light(vec4(-215, 34, -7, 1), yellow, 1000),
+            new Light(vec4(-215, 30, -25, 1), yellow, 1000),
+            new Light(vec4(-200, 35, -45, 1), yellow, 1000),
+
+
+
         ];
 
         // create day and night sequence
@@ -534,7 +543,7 @@ export class GriffithScene extends Scene {
 class Gouraud_Shader extends Shader {
     // This is a Shader using Phong_Shader as template
 
-    constructor(num_lights = 20) {
+    constructor(num_lights = 30) {
         super();
         this.num_lights = num_lights;
     }
