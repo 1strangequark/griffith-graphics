@@ -61,6 +61,8 @@ export class ObservatoryScene extends Scene {
             this.shapes.cube.draw(context, program_state, window_transform, this.materials.concrete);
             let back_plate_transform = window_transform.times(Mat4.translation(2,0,1));
             this.shapes.square.draw(context, program_state, back_plate_transform, this.materials.concrete);
+            let front_plate_transform = back_plate_transform.times(Mat4.translation(0,0,-1));
+            this.shapes.square.draw(context, program_state, front_plate_transform, this.materials.concrete);
             window_offset += 2;
         }
         window_offset = -3.5;
@@ -69,6 +71,8 @@ export class ObservatoryScene extends Scene {
             this.shapes.cube.draw(context, program_state, window_transform, this.materials.concrete);
             let back_plate_transform = window_transform.times(Mat4.translation(-2,0,1));
             this.shapes.square.draw(context, program_state, back_plate_transform, this.materials.concrete);
+            let front_plate_transform = back_plate_transform.times(Mat4.translation(0,0,-1));
+            this.shapes.square.draw(context, program_state, front_plate_transform, this.materials.concrete);
             window_offset -= 2;
         }
     }
