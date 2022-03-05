@@ -294,6 +294,105 @@ export class GriffithScene extends Scene {
         this.shapes.sphere3.draw(context, program_state,bush_transform3, this.materials.dark_grass);
         this.shapes.sphere3.draw(context, program_state,bush_transform4, this.materials.dark_grass);
 
+    }
+
+    display_HollywoodSign(context, program_state)
+    {
+        //Creating the Hills
+        let hill_transform2 = Mat4.identity().times(Mat4.translation(-250, 10, -70)).times(Mat4.scale(70, 40, 70));
+        let hill_transform3 = Mat4.identity().times(Mat4.translation(-270, 30, -20)).times(Mat4.scale(45, 40, 85));
+        let hill_transform4 = Mat4.identity().times(Mat4.translation(-250, 5, 10)).times(Mat4.scale(70, 40, 90));
+        let hill_transform5 = Mat4.identity().times(Mat4.translation(-200, -15, 10)).times(Mat4.scale(70, 40, 90));
+        let hill_transform6 = Mat4.identity().times(Mat4.translation(-200, -15, 50)).times(Mat4.scale(70, 40, 90));
+        let hill_transform7 = Mat4.identity().times(Mat4.translation(-200, -15, -100)).times(Mat4.scale(70, 40, 90));
+
+
+
+
+        this.shapes.sphere3.draw(context, program_state, hill_transform2, this.materials.dark_grass);
+        this.shapes.sphere3.draw(context, program_state, hill_transform3, this.materials.dark_grass);
+        this.shapes.sphere3.draw(context, program_state, hill_transform4, this.materials.dark_grass);
+        this.shapes.sphere.draw(context, program_state, hill_transform5, this.materials.dark_grass);
+        this.shapes.sphere.draw(context, program_state, hill_transform6, this.materials.dark_grass);
+        this.shapes.sphere.draw(context, program_state, hill_transform7, this.materials.dark_grass);
+
+
+
+        //Constructing "HOLLYWOOD"
+
+        //Letter H
+        let H_trans1 = Mat4.identity().times(Mat4.translation(-220,35,30)).times(Mat4.scale(0.75,4.5,0.75));
+        let H_trans2 = Mat4.identity().times(Mat4.translation(-220,35,25)).times(Mat4.scale(0.75,4.5,0.75));
+        let H_trans3 = Mat4.identity().times(Mat4.translation(-220,35,27.5)).times(Mat4.scale(0.75,0.75,2));
+        //Letter O
+        let O_trans1 = Mat4.identity().times(Mat4.translation(-220,38.5,19)).times(Mat4.scale(0.75,0.75,3.5));
+        let O_trans2 = Mat4.identity().times(Mat4.translation(-220,31.5,19)).times(Mat4.scale(0.75,0.75,3.5));
+        let O_trans3 = Mat4.identity().times(Mat4.translation(-220,35,22)).times(Mat4.scale(0.75,4,0.75));
+        let O_trans4 = Mat4.identity().times(Mat4.translation(-220,35,16)).times(Mat4.scale(0.75,4,0.75));
+        //Letter L 1
+        let L_trans1 = Mat4.identity().times(Mat4.translation(-220,35,13)).times(Mat4.scale(0.75,4,0.75));
+        let L_trans2 = Mat4.identity().times(Mat4.translation(-220,31.5,10)).times(Mat4.scale(0.75,0.75,3));
+        //Letter L 2
+        let L_trans3 = Mat4.identity().times(Mat4.translation(-220,35,5)).times(Mat4.scale(0.75,4,0.75));
+        let L_trans4 = Mat4.identity().times(Mat4.translation(-220,31.5,2)).times(Mat4.scale(0.75,0.75,3));
+        //Letter Y
+        let Y_trans1 = Mat4.identity().times(Mat4.translation(-220,36,-3)).times(Mat4.scale(0.75,2.5,0.75));
+        let Y_trans2 = Mat4.identity().times(Mat4.translation(-220,36,-8)).times(Mat4.scale(0.75,2.5,0.75));
+        let Y_trans3 = Mat4.identity().times(Mat4.translation(-220,34,-5.5)).times(Mat4.scale(0.75,0.75,2.5));
+        let Y_trans4 = Mat4.identity().times(Mat4.translation(-220,32,-5.5)).times(Mat4.scale(0.75,2,0.75));
+        //Letter W
+        let W_trans1 = Mat4.identity().times(Mat4.translation(-220,35,-11)).times(Mat4.scale(0.75,4,0.75));
+        let W_trans2 = Mat4.identity().times(Mat4.translation(-220,35,-18)).times(Mat4.scale(0.75,4,0.75));
+        let W_trans3 = Mat4.identity().times(Mat4.translation(-220,31.5,-14.5)).times(Mat4.scale(0.75,0.75,4));
+        let W_trans4 = Mat4.identity().times(Mat4.translation(-220,35,-14.5)).times(Mat4.scale(0.75,4,0.75));
+        //Letter O2
+        let O_trans5 = Mat4.identity().times(Mat4.translation(-220,38.5,-24)).times(Mat4.scale(0.75,0.75,3.5));
+        let O_trans6 = Mat4.identity().times(Mat4.translation(-220,31.5,-24)).times(Mat4.scale(0.75,0.75,3.5));
+        let O_trans7 = Mat4.identity().times(Mat4.translation(-220,35,-27)).times(Mat4.scale(0.75,4,0.75));
+        let O_trans8 = Mat4.identity().times(Mat4.translation(-220,35,-21)).times(Mat4.scale(0.75,4,0.75));
+        //Letter O3
+        let O_trans9 = Mat4.identity().times(Mat4.translation(-215,40,-33)).times(Mat4.scale(0.75,0.75,3.5));
+        let O_trans10 = Mat4.identity().times(Mat4.translation(-215,33,-33)).times(Mat4.scale(0.75,0.75,3.5));
+        let O_trans11 = Mat4.identity().times(Mat4.translation(-215,36.5,-36)).times(Mat4.scale(0.75,4,0.75));
+        let O_trans12 = Mat4.identity().times(Mat4.translation(-215,36.5,-30)).times(Mat4.scale(0.75,4,0.75));
+        //Letter O3
+        let D_trans1 = Mat4.identity().times(Mat4.translation(-215,41,-42)).times(Mat4.scale(0.75,0.75,3.5));
+        let D_trans2 = Mat4.identity().times(Mat4.translation(-215,34,-42)).times(Mat4.scale(0.75,0.75,3.5));
+        let D_trans3 = Mat4.identity().times(Mat4.translation(-215,37.5,-45)).times(Mat4.scale(0.75,4,0.75));
+        let D_trans4 = Mat4.identity().times(Mat4.translation(-215,37.5,-39)).times(Mat4.scale(0.75,5.5,0.75));
+
+        this.shapes.cube.draw(context, program_state,H_trans1, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,H_trans2, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,H_trans3, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans1, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans2, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans3, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans4, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,L_trans1, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,L_trans2, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,L_trans3, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,L_trans4, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,Y_trans1, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,Y_trans2, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,Y_trans3, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,Y_trans4, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,W_trans1, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,W_trans2, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,W_trans3, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,W_trans4, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans5, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans6, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans7, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans8, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans9, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans10, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans11, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,O_trans12, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,D_trans1, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,D_trans2, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,D_trans3, this.materials.concrete);
+        this.shapes.cube.draw(context, program_state,D_trans4, this.materials.concrete);
+
 
     }
 
@@ -407,6 +506,8 @@ export class GriffithScene extends Scene {
         //Create a hill
         let hill_transform = Mat4.identity().times(Mat4.translation(0, -10, 0)).times(Mat4.scale(70, 13, 70));
         this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
+
+        this.display_HollywoodSign(context,program_state);
 
         // Create trees on platform
             // front and back (camera view)
