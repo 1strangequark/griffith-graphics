@@ -33,8 +33,12 @@ export class ObservatoryScene extends Scene {
                 {ambient: 1, diffusivity: 0.9, specularity: 0, color: hex_color("#c2c0c0")}),
             concrete2: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0.9, specularity: 0, color: hex_color("#868686")}),
+            balconytop: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 0.9, specularity: 0, color: hex_color("#ababab")}),
             observatory_roof: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#161c96")}),
+            balcony_stairs: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#565656")}),
             observatory_decoration: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1, specularity: 0, color: hex_color("#1e6b61")}),
             sky: new Material(new defs.Phong_Shader(),
@@ -137,6 +141,10 @@ export class ObservatoryScene extends Scene {
         this.shapes.sphere.draw(context, program_state, roof_2_transform, this.materials.observatory_roof);
         let roof_3_transform = roof_2_transform.times(Mat4.translation(-2.0 * roof_separation, 0, 0))
         this.shapes.sphere.draw(context, program_state, roof_3_transform, this.materials.observatory_roof);
+        let roofTop1 = Mat4.identity().times(Mat4.translation(8,7,13)).times(Mat4.scale(3.5,.25,1.5));
+        this.shapes.cube.draw(context, program_state, roofTop1, this.materials.concrete2);
+        let roofTop2 = Mat4.identity().times(Mat4.translation(-8,7,13)).times(Mat4.scale(3.5,.25,1.5));
+        this.shapes.cube.draw(context, program_state, roofTop2, this.materials.concrete2);
     }
 
 
@@ -150,6 +158,58 @@ export class ObservatoryScene extends Scene {
         let building_topper_sphere = building_topper_cylinder.times(Mat4.scale(0.8, 0.8, 2)).times(Mat4.translation(0, 0, 0));
         this.shapes.sphere.draw(context, program_state, building_topper_sphere, this.materials.observatory_decoration);
     }
+
+    display_back_balconies (context, program_state) {
+        let balcony1 = Mat4.identity().times(Mat4.translation(9.5,4.1,20)).times(Mat4.scale(4.5,1,5));
+        this.shapes.cube.draw(context, program_state, balcony1, this.materials.concrete);
+        let balcony2 = Mat4.identity().times(Mat4.translation(-9.5,4.1,20)).times(Mat4.scale(4.5,1,5));
+        this.shapes.cube.draw(context, program_state, balcony2, this.materials.concrete);
+        let balconyFloor1 = Mat4.identity().times(Mat4.translation(10,4.2,20)).times(Mat4.scale(4,1,4.5));
+        this.shapes.cube.draw(context, program_state, balconyFloor1, this.materials.balconytop);
+        let balconyFloor2 = Mat4.identity().times(Mat4.translation(-10,4.2,20)).times(Mat4.scale(4,1,4.5));
+        this.shapes.cube.draw(context, program_state, balconyFloor2, this.materials.balconytop);
+
+    }
+
+    display_balcony_stairs(context, program_state)
+    {
+        let stairTransform = Mat4.identity();
+
+        //Left Stairs
+        let ycoord1 = 3.1;
+        let zcoord1 = 13;
+        let xcoord1 = 17.5;
+        let rotation1 = 0;
+        let xscale1 = 1.3;
+
+        for (let i = 0; i < 20 ; i++)
+        {
+            this.shapes.cube.draw(context, program_state, stairTransform.times(Mat4.translation(xcoord1,ycoord1,zcoord1)).times(Mat4.scale(xscale1,0.08,2)).times(Mat4.rotation(rotation1,0,10,0)), this.materials.concrete2);
+            ycoord1 = ycoord1 + 0.10;
+            zcoord1 = zcoord1 + 0.25;
+            xcoord1 = xcoord1 - 0.35;
+            rotation1 = rotation1 - 0.1;
+            xscale1 = xscale1 + 0.2;
+        }
+
+        //Right Stairs
+        let ycoord2 = 3.1;
+        let zcoord2 = 13;
+        let xcoord2 = -17.5;
+        let rotation2 = 0;
+        let xscale2 = 1.3;
+
+        for (let i = 0; i < 20 ; i++)
+        {
+            this.shapes.cube.draw(context, program_state, stairTransform.times(Mat4.translation(xcoord2,ycoord2,zcoord2)).times(Mat4.scale(xscale2,0.08,2)).times(Mat4.rotation(rotation2,0,10,0)), this.materials.concrete2);
+            ycoord2 = ycoord2 + 0.10;
+            zcoord2 = zcoord2 + 0.25;
+            xcoord2 = xcoord2 + 0.35;
+            rotation2 = rotation2 + 0.1;
+            xscale2 = xscale2 + 0.2;
+        }
+    }
+
 
     display(context, program_state) {
         // display():  Called once per frame of animation.
@@ -195,6 +255,9 @@ export class ObservatoryScene extends Scene {
         this.display_roofs(context, program_state);
         this.display_building_body(context, program_state);
         this.display_frontWall_columns(context, program_state);
+        this.display_back_balconies(context, program_state);
+        this.display_balcony_stairs(context, program_state);
 
-    }
+
+        }
 }
