@@ -164,9 +164,9 @@ export class ObservatoryScene extends Scene {
         this.shapes.cube.draw(context, program_state, balcony1, this.materials.concrete);
         let balcony2 = Mat4.identity().times(Mat4.translation(-9.5,4.1,20)).times(Mat4.scale(4.5,1,5));
         this.shapes.cube.draw(context, program_state, balcony2, this.materials.concrete);
-        let balconyFloor1 = Mat4.identity().times(Mat4.translation(10,4.2,20)).times(Mat4.scale(4,1,4.5));
+        let balconyFloor1 = Mat4.identity().times(Mat4.translation(10,4.2,20)).times(Mat4.scale(3.9,1,4.5));
         this.shapes.cube.draw(context, program_state, balconyFloor1, this.materials.balconytop);
-        let balconyFloor2 = Mat4.identity().times(Mat4.translation(-10,4.2,20)).times(Mat4.scale(4,1,4.5));
+        let balconyFloor2 = Mat4.identity().times(Mat4.translation(-10,4.2,20)).times(Mat4.scale(3.9,1,4.5));
         this.shapes.cube.draw(context, program_state, balconyFloor2, this.materials.balconytop);
 
     }
