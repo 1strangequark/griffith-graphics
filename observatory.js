@@ -210,6 +210,24 @@ export class ObservatoryScene extends Scene {
         }
     }
 
+    display_balcony_fence(context, program_state)
+    {
+        let mainTrans = Mat4.identity();
+
+        this.shapes.cube.draw(context, program_state, mainTrans.times(Mat4.translation(9.5,6.1,24.5)).times(Mat4.scale(4,0.10,0.10)), this.materials.balcony_stairs);
+        this.shapes.cube.draw(context, program_state, mainTrans.times(Mat4.translation(13.5,6.1,22.5)).times(Mat4.scale(0.10,0.10,2)), this.materials.balcony_stairs);
+        this.shapes.cube.draw(context, program_state, mainTrans.times(Mat4.translation(13.5,5.7,20.5)).times(Mat4.scale(0.10,0.5,0.10)), this.materials.balcony_stairs);
+        this.shapes.cube.draw(context, program_state, mainTrans.times(Mat4.translation(13.5,5.7,24.5)).times(Mat4.scale(0.10,0.5,0.10)), this.materials.balcony_stairs);
+
+
+        this.shapes.cube.draw(context, program_state, mainTrans.times(Mat4.translation(-9.5,6.1,24.5)).times(Mat4.scale(4,0.10,0.10)), this.materials.balcony_stairs);
+        this.shapes.cube.draw(context, program_state, mainTrans.times(Mat4.translation(-13.5,6.1,22.5)).times(Mat4.scale(0.10,0.10,2)), this.materials.balcony_stairs);
+        this.shapes.cube.draw(context, program_state, mainTrans.times(Mat4.translation(-13.5,5.7,20.5)).times(Mat4.scale(0.10,0.5,0.10)), this.materials.balcony_stairs);
+        this.shapes.cube.draw(context, program_state, mainTrans.times(Mat4.translation(-13.5,5.7,24.5)).times(Mat4.scale(0.10,0.5,0.10)), this.materials.balcony_stairs);
+
+    }
+
+
 
     display(context, program_state) {
         // display():  Called once per frame of animation.
@@ -257,7 +275,7 @@ export class ObservatoryScene extends Scene {
         this.display_frontWall_columns(context, program_state);
         this.display_back_balconies(context, program_state);
         this.display_balcony_stairs(context, program_state);
-
+        this.display_balcony_fence(context,program_state);
 
         }
 }
