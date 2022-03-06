@@ -224,7 +224,12 @@ export class Weather extends Simulation {
             }
         }
         // Delete bodies that fall through the floor:
-        this.bodies = this.bodies.filter(b => !(b.center[1] < -8 && b.linear_velocity[1] < 0));
+        if (super.fogEnabled) {
+            this.bodies = this.bodies.filter(b => b.linear_velocity[1] === 0);
+        }
+        else {
+            this.bodies = this.bodies.filter(b => !(b.center[1] < -8 && b.linear_velocity[1] < 0));
+        }
     }
 
     display(context, program_state) {
