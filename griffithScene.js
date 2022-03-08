@@ -129,7 +129,7 @@ export class GriffithScene extends Scene {
         this.key_triggered_button("Orbit", ["Control", "1"], () => this.setCameraActivity("Orbit"));
         this.new_line();
         this.new_line();
-        this.key_triggered_button("Create New Buildings", ["n"], () => this.update_building_coords());
+        this.key_triggered_button("Respawn Buildings", ["n"], () => this.update_building_coords());
         this.live_string(box => {
             box.textContent = "Number of Buildings: " + (this.num_buildings);
         });
@@ -139,11 +139,15 @@ export class GriffithScene extends Scene {
     }
 
     incrementBuildings() {
-        this.num_buildings += 1;
+        if (this.num_buildings < 75) {
+            this.num_buildings += 1;
+        }
     }
 
     decrementBuildings() {
-        this.num_buildings -= 1;
+        if (this.num_buildings >= 1) {
+            this.num_buildings -= 1;
+        }
     }
 
     day_night_sequence(context, program_state, t, dt) {
