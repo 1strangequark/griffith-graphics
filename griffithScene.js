@@ -1,8 +1,10 @@
 import {defs, tiny} from './examples/common.js';
 
 const {
-    Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
+    Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Texture, Scene,
 } = tiny;
+
+const {Textured_Phong} = defs
 const SPEED_UP = 1;
 const SLOW_DOWN = -1;
 
@@ -10,11 +12,12 @@ export class GriffithScene extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
-
+        this.num_buildings = 30;
         this.lights_size = 0;
         this.camera_activity_time = 0;
         this.camera_activity = "";
         this.orbit_time = 9;
+        this.building_props = [];
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
             torus: new defs.Torus(15, 15),
@@ -23,6 +26,7 @@ export class GriffithScene extends Scene {
             sphere2: new defs.Subdivision_Sphere(4),
             sphere3: new defs.Subdivision_Sphere(1),
             circle: new defs.Regular_2D_Polygon(1, 30),
+            capped_cylinder: new defs.Capped_Cylinder(10, 10),
             cube: new defs.Cube(),
             square: new defs.Square(),
             triangle: new defs.Triangle(),
@@ -38,13 +42,13 @@ export class GriffithScene extends Scene {
             test: new Material(new defs.Phong_Shader(),
                 {ambient: .5, diffusivity: .6, color: hex_color("#ffffff")}),
             grass: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46")}),
+                {ambient: 0.7, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46")}),
             dark_grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#2f5128")}),
             light_grass: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
+                {ambient: 0.6, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
             tree_leaves: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#5aab61")}),
+                {ambient: 0.8, diffusivity: 1.0, specularity: 0, color: hex_color("#5aab61")}),
             tree_trunk: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#795c34")}),
             concrete: new Material(new defs.Phong_Shader(),
@@ -54,11 +58,15 @@ export class GriffithScene extends Scene {
             lightBase: new Material(new defs.Phong_Shader(),
                 {ambient: 0.7, diffusivity: 0.5, specularity: 1, color: hex_color("#989292")}),
             lightBulb: new Material(new defs.Phong_Shader(),
-                {ambient: 1, color: hex_color("#bdad07")}),
+                {ambient: 1, specularity: 1, color: hex_color("#bdad07")}),
             bushBase: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#4d3206")}),
             sun:  new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0,color: hex_color("#feff05")}),
+            building: new Material(new Textured_Phong(),
+                {ambient: 0.8, diffusivity: 1, specularity: 1, color: hex_color("#000000"), texture: new Texture("assets/building.png")}),
+            building_dark: new Material(new Textured_Phong(),
+                {ambient: 1, diffusivity: 1, specularity: 1, color: hex_color("#000000"), texture: new Texture("assets/building_night.png")}),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
@@ -75,6 +83,7 @@ export class GriffithScene extends Scene {
             theta : Math.PI / 10,
             transform: Mat4.identity(),
         }
+        this.update_building_coords();
     }
 
     change_day_night_period(speed_up) {
@@ -114,7 +123,24 @@ export class GriffithScene extends Scene {
         });
         this.new_line();
         this.key_triggered_button("Free Movement", ["Control", "0"], () => this.setCameraActivity("Start"));
-        this.key_triggered_button("Orbit", ["Control", "0"], () => this.setCameraActivity("Orbit"));
+        this.key_triggered_button("Orbit", ["Control", "1"], () => this.setCameraActivity("Orbit"));
+        this.new_line();
+        this.new_line();
+        this.key_triggered_button("Create New Buildings", ["n"], () => this.update_building_coords());
+        this.live_string(box => {
+            box.textContent = "Number of Buildings: " + (this.num_buildings);
+        });
+        this.key_triggered_button("Increase Buildings", ["b"], () => this.incrementBuildings());
+        this.key_triggered_button("Decrease Buildings", ["v"], () => this.decrementBuildings());
+
+    }
+
+    incrementBuildings() {
+        this.num_buildings += 1;
+    }
+
+    decrementBuildings() {
+        this.num_buildings -= 1;
     }
 
     day_night_sequence(context, program_state, t, dt) {
@@ -399,6 +425,50 @@ export class GriffithScene extends Scene {
 
     }
 
+    validate_distance(x, z, min_dist) {
+        // calculate euclidian distance
+        var valid = true;
+        for (var i = 0; i < this.building_props.length; i++) {
+            let distance = Math.sqrt(Math.pow(x - this.building_props[i][0], 2) + Math.pow(z - this.building_props[i][1], 2));
+            if (distance < min_dist) {
+                valid = false;
+            }
+        }
+        return valid;
+    }
+
+    getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+    }
+
+    update_building_coords() {
+        let xVar = 200;
+        let zVar = 100;
+        this.building_props = [];
+        for (let i = 0; i < this.num_buildings; i++)
+        {
+            var x = 0;
+            var z = 0;
+            do {
+                x = 100 + this.getRandomInt(-xVar, xVar);
+                z = 200 + this.getRandomInt(-zVar, zVar);
+            } while (!this.validate_distance(x, z, 25));
+            let height = this.getRandomInt(1, 5);
+            this.building_props.push([x,z, height]);
+        }
+    }
+
+    display_city(context, program_state)
+    {
+        for (var i = 0; i < this.building_props.length; i++) {
+            for (var j = 0; j < this.building_props[i][2]; j++) {
+                let square_build_trans = Mat4.identity().times(Mat4.translation(this.building_props[i][0],j * 20,this.building_props[i][1])).times(Mat4.scale(10, 10, 10));
+                this.shapes.cube.draw(context, program_state, square_build_trans, this.sun.sun_rise ? this.materials.building : this.materials.building_dark);
+            }
+        }
+    }
 
 
     display(context, program_state) {
@@ -537,5 +607,7 @@ export class GriffithScene extends Scene {
         this.display_tree(context, program_state, -4, 0, 4, 2);
         this.display_tree(context, program_state, 4, 0, -7, 2);
         this.display_tree(context, program_state, 4, 0, -9, 1);
+
+        this.display_city(context,program_state);
     }
 }
