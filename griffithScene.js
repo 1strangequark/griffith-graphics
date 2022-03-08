@@ -12,7 +12,7 @@ export class GriffithScene extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
-        this.num_buildings = 30;
+        this.num_buildings = 20;
         this.lights_size = 0;
         this.starSize = 0;
         this.camera_activity_time = 0;
