@@ -12,6 +12,7 @@ export class GriffithScene extends Scene {
         super();
 
         this.lights_size = 0;
+        this.starSize = 0;
         this.camera_activity_time = 0;
         this.camera_activity = "";
         this.orbit_time = 9;
@@ -37,6 +38,8 @@ export class GriffithScene extends Scene {
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
                 {ambient: .5, diffusivity: .6, color: hex_color("#ffffff")}),
+            star: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 0, color: hex_color("#ffffff")}),
             grass: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46")}),
             dark_grass: new Material(new defs.Phong_Shader(),
@@ -158,6 +161,7 @@ export class GriffithScene extends Scene {
             else
                 sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
             this.lights_size = 9;
+            this.starSize = 10;
 
         } else if (this.sun.max_day_night_interval < this.sun.transition) {
             // end of sunrise
@@ -171,6 +175,8 @@ export class GriffithScene extends Scene {
             else
                 sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
             this.lights_size = 0;
+            this.starSize = 0;
+
 
         } else if (this.sun.max_day_night_interval > this.sun.max_day_interval - this.sun.transition / 3) {
             // beginning of sunrise
@@ -399,6 +405,32 @@ export class GriffithScene extends Scene {
 
     }
 
+    displayStars(context, program_state)
+    {
+        let star_trans = Mat4.identity();
+
+        this.shapes.sphere2.draw(context, program_state,
+            star_trans.times(Mat4.translation(Math.random() * (300 - 300) + 300,Math.random() * (450 - 400) + 400,Math.random() * (200 - 200) + 200)),
+            this.materials.star);
+        this.shapes.sphere2.draw(context, program_state,
+            star_trans.times(Mat4.translation(Math.random() * (300 - 300) + 300,Math.random() * (450 - 400) + 400,Math.random() * (200 - 200) + 200)),
+            this.materials.star);
+        this.shapes.sphere2.draw(context, program_state,
+            star_trans.times(Mat4.translation(Math.random() * (300 - 300) + 300,Math.random() * (450 - 400) + 400,Math.random() * (200 - 200) + 200)),
+            this.materials.star);
+        this.shapes.sphere2.draw(context, program_state,
+            star_trans.times(Mat4.translation(Math.random() * (300 - 300) + 300,Math.random() * (450 - 400) + 400,Math.random() * (200 - 200) + 200)),
+            this.materials.star);
+        this.shapes.sphere2.draw(context, program_state,
+            star_trans.times(Mat4.translation(Math.random() * (300 - 300) + 300,Math.random() * (450 - 400) + 400,Math.random() * (200 - 200) + 200)),
+            this.materials.star);
+        this.shapes.sphere2.draw(context, program_state,
+            star_trans.times(Mat4.translation(Math.random() * (300 - 300) + 300,Math.random() * (450 - 400) + 400,Math.random() * (200 - 200) + 200)),
+            this.materials.star);
+
+    }
+
+
 
 
     display(context, program_state) {
@@ -417,6 +449,8 @@ export class GriffithScene extends Scene {
 
         const light_position = vec4(0, 5, 5, 1);
         const yellow = hex_color("#fac91a");
+        const white = hex_color("#ef0505");
+
         const sun_yellow = hex_color("#feff05");
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
@@ -426,6 +460,7 @@ export class GriffithScene extends Scene {
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
+
             new Light(day_night_sequence.light_position, sun_yellow, day_night_sequence.radius),
             //courtyard Lights
             new Light(vec4(5.2, 5, 5.2, 1), yellow, this.lights_size),
@@ -447,6 +482,7 @@ export class GriffithScene extends Scene {
             new Light(vec4(-215, 34, -7, 1), yellow, 1000),
             new Light(vec4(-215, 30, -25, 1), yellow, 1000),
             new Light(vec4(-200, 35, -45, 1), yellow, 1000),
+
         ];
 
         // create day and night sequence
@@ -509,6 +545,7 @@ export class GriffithScene extends Scene {
 
         this.display_Entry_bushes(context,program_state);
         this.display_Side_bushes(context, program_state);
+        this.displayStars(context, program_state);
 
 
 
@@ -543,7 +580,7 @@ export class GriffithScene extends Scene {
 class Gouraud_Shader extends Shader {
     // This is a Shader using Phong_Shader as template
 
-    constructor(num_lights = 30) {
+    constructor(num_lights = 200) {
         super();
         this.num_lights = num_lights;
     }
