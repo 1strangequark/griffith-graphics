@@ -14,6 +14,7 @@ export class GriffithScene extends Scene {
         super();
         this.num_buildings = 30;
         this.lights_size = 0;
+        this.starSize = 0;
         this.camera_activity_time = 0;
         this.camera_activity = "";
         this.orbit_time = 9;
@@ -41,6 +42,8 @@ export class GriffithScene extends Scene {
         this.materials = {
             test: new Material(new defs.Phong_Shader(),
                 {ambient: .5, diffusivity: .6, color: hex_color("#ffffff")}),
+            star: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
             grass: new Material(new defs.Phong_Shader(),
                 {ambient: 0.7, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46")}),
             dark_grass: new Material(new defs.Phong_Shader(),
@@ -184,6 +187,7 @@ export class GriffithScene extends Scene {
             else
                 sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
             this.lights_size = 9;
+            this.starSize = 10;
 
         } else if (this.sun.max_day_night_interval < this.sun.transition) {
             // end of sunrise
@@ -197,6 +201,8 @@ export class GriffithScene extends Scene {
             else
                 sky_color = color(sky_color_x, sky_color_y, sky_color_z, 1);
             this.lights_size = 0;
+            this.starSize = 0;
+
 
         } else if (this.sun.max_day_night_interval > this.sun.max_day_interval - this.sun.transition / 3) {
             // beginning of sunrise
@@ -424,7 +430,6 @@ export class GriffithScene extends Scene {
 
 
     }
-
     validate_distance(x, z, min_dist) {
         // calculate euclidian distance
         var valid = true;
@@ -469,7 +474,32 @@ export class GriffithScene extends Scene {
             }
         }
     }
+    displayStars(context, program_state)
+    {
+        let starTuples = [
+            [0,200,150], [20,200,200], [20,200,-175], [35,200,180], [200,200,-250], [250,200,-40], [-100,200,30],
+            [-13,200,60], [-10,200,-150], [30,200,-100], [-40,200,250], [125,200,30], [-175,200,20], [200,200,20],
+            [150,200,0], [-30,100,740], [-75,200,400], [90,200,-400], [-10,100,400], [-20,150,400], [20,100,400],
+            [40,150,400], [-70,90,400], [-50,150,400], [190,120,400], [40,120,400], [-110,140,400], [-120,100,400],
+            [90,100,400], [140,120,400], [-10,230,400], [-140,100,400], [140,105,400], [70,90,-400], [50,150,-400],
+            [-190,120,-400], [-40,115,-400], [110,90,-400], [120,100,-400], [-90,130,-400], [-140,120,-400],
+            [10,100,-400], [140,240,-400], [-140,105,-400], [400,90,70], [400,150,50], [400,120,-190], [400,160,-40],
+            [400,100,110], [400,200,120], [400,110,-140], [400,230,10], [400,110,-500], [400,205,-140], [300,90,300],
+            [380,120,250], [220,135,250], [220,150,250], [220,250,250], [200,100,250], [250,250,250], [300,90,-300],
+            [380,120,-250], [220,135,-250], [220,150,-250], [220,250,-250], [200,100,-250], [250,250,-250],
+            [-300,90,-300], [-380,90,-250], [-220,90,-250], [-220,150,-250], [-220,250,-250], [-200,150,-250],
+            [-250,250,-250], [-400,90,70], [-400,150,50], [-400,120,-190], [-400,160,-40], [-400,140,110],
+            [-400,200,120], [-400,100,-90], [-400,110,-140], [-400,230,10], [-400,100,140], [-400,200,-500],
+            [-400,210,-140], [-300,90,300], [-380,120,250], [-220,135,250], [-220,150,250], [-220,250,250],
+            [-200,100,250], [-250,250,250],
+        ];
+        let star_trans = Mat4.identity();
+        for(var i = 0; i < starTuples.length; i++) {
+            this.shapes.sphere.draw(context, program_state, star_trans.times(Mat4.translation(starTuples[i][0],
+                starTuples[i][1], starTuples[i][2])), this.materials.star);
+        }
 
+    }
 
     display(context, program_state) {
         // display():  Called once per frame of animation.
@@ -487,6 +517,8 @@ export class GriffithScene extends Scene {
 
         const light_position = vec4(0, 5, 5, 1);
         const yellow = hex_color("#fac91a");
+        const white = hex_color("#ef0505");
+
         const sun_yellow = hex_color("#feff05");
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
@@ -496,6 +528,7 @@ export class GriffithScene extends Scene {
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
+
             new Light(day_night_sequence.light_position, sun_yellow, day_night_sequence.radius),
             //courtyard Lights
             new Light(vec4(5.2, 5, 5.2, 1), yellow, this.lights_size),
@@ -517,6 +550,7 @@ export class GriffithScene extends Scene {
             new Light(vec4(-215, 34, -7, 1), yellow, 1000),
             new Light(vec4(-215, 30, -25, 1), yellow, 1000),
             new Light(vec4(-200, 35, -45, 1), yellow, 1000),
+
         ];
 
         // create day and night sequence
@@ -579,6 +613,7 @@ export class GriffithScene extends Scene {
 
         this.display_Entry_bushes(context,program_state);
         this.display_Side_bushes(context, program_state);
+        this.displayStars(context, program_state);
 
 
 
@@ -607,7 +642,5 @@ export class GriffithScene extends Scene {
         this.display_tree(context, program_state, -4, 0, 4, 2);
         this.display_tree(context, program_state, 4, 0, -7, 2);
         this.display_tree(context, program_state, 4, 0, -9, 1);
-
-        this.display_city(context,program_state);
     }
 }
