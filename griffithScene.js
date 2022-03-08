@@ -141,12 +141,14 @@ export class GriffithScene extends Scene {
     incrementBuildings() {
         if (this.num_buildings < 75) {
             this.num_buildings += 1;
+            this.update_building_coords()
         }
     }
 
     decrementBuildings() {
         if (this.num_buildings >= 1) {
             this.num_buildings -= 1;
+            this.update_building_coords()
         }
     }
 
@@ -473,7 +475,7 @@ export class GriffithScene extends Scene {
     {
         for (var i = 0; i < this.building_props.length; i++) {
             for (var j = 0; j < this.building_props[i][2]; j++) {
-                let square_build_trans = Mat4.identity().times(Mat4.translation(this.building_props[i][0],j * 20,this.building_props[i][1])).times(Mat4.scale(10, 10, 10));
+                let square_build_trans = Mat4.identity().times(Mat4.translation(this.building_props[i][0],j * 10,this.building_props[i][1])).times(Mat4.scale(5, 5, 5));
                 this.shapes.cube.draw(context, program_state, square_build_trans, this.sun.sun_rise ? this.materials.building : this.materials.building_dark);
             }
         }
