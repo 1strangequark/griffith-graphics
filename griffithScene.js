@@ -407,117 +407,30 @@ export class GriffithScene extends Scene {
 
     displayStars(context, program_state)
     {
+        let starTuples = [
+            [0,200,150], [20,200,200], [20,200,-175], [35,200,180], [200,200,-250], [250,200,-40], [-100,200,30],
+            [-13,200,60], [-10,200,-150], [30,200,-100], [-40,200,250], [125,200,30], [-175,200,20], [200,200,20],
+            [150,200,0], [-30,100,740], [-75,200,400], [90,200,-400], [-10,100,400], [-20,150,400], [20,100,400],
+            [40,150,400], [-70,90,400], [-50,150,400], [190,120,400], [40,120,400], [-110,140,400], [-120,100,400],
+            [90,100,400], [140,120,400], [-10,230,400], [-140,100,400], [140,105,400], [70,90,-400], [50,150,-400],
+            [-190,120,-400], [-40,115,-400], [110,90,-400], [120,100,-400], [-90,130,-400], [-140,120,-400],
+            [10,100,-400], [140,240,-400], [-140,105,-400], [400,90,70], [400,150,50], [400,120,-190], [400,160,-40],
+            [400,100,110], [400,200,120], [400,110,-140], [400,230,10], [400,110,-500], [400,205,-140], [300,90,300],
+            [380,120,250], [220,135,250], [220,150,250], [220,250,250], [200,100,250], [250,250,250], [300,90,-300],
+            [380,120,-250], [220,135,-250], [220,150,-250], [220,250,-250], [200,100,-250], [250,250,-250],
+            [-300,90,-300], [-380,90,-250], [-220,90,-250], [-220,150,-250], [-220,250,-250], [-200,150,-250],
+            [-250,250,-250], [-400,90,70], [-400,150,50], [-400,120,-190], [-400,160,-40], [-400,140,110],
+            [-400,200,120], [-400,100,-90], [-400,110,-140], [-400,230,10], [-400,100,140], [-400,200,-500],
+            [-400,210,-140], [-300,90,300], [-380,120,250], [-220,135,250], [-220,150,250], [-220,250,250],
+            [-200,100,250], [-250,250,250],
+        ];
         let star_trans = Mat4.identity();
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(0,200,150)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(20,200,200)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(20,200,-175)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(35,200,180)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(200,200,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(250,200,-40)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-100,200,30)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-13,200,60)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-10,200,-150)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(30,200,-100)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-40,200,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(125,200,30)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-175,200,20)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(200,200,20)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(150,200,0)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-30,100,740)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-75,200,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(90,200,-400)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-10,100,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-20,150,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(20,100,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(40,150,400)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-70,90,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-50,150,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(190,120,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(40,120,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-110,140,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-120,100,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(90,100,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(140,120,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-10,230,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-140,100,400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(140,105,400)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(70,90,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(50,150,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-190,120,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-40,115,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(110,90,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(120,100,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-90,130,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-140,120,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(10,100,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(140,240,-400)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-140,105,-400)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,90,70)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,150,50)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,120,-190)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,160,-40)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,100,110)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,200,120)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,110,-140)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,230,10)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,110,-500)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(400,205,-140)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(300,90,300)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(380,120,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(220,135,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(220,150,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(220,250,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(200,100,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(250,250,250)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(300,90,-300)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(380,120,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(220,135,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(220,150,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(220,250,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(200,100,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(250,250,-250)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-300,90,-300)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-380,90,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-220,90,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-220,150,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-220,250,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-200,150,-250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-250,250,-250)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,90,70)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,150,50)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,120,-190)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,160,-40)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,140,110)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,200,120)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,100,-90)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,110,-140)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,230,10)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,100,140)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,200,-500)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-400,210,-140)), this.materials.star);
-
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-300,90,300)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-380,120,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-220,135,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-220,150,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-220,250,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-200,100,250)), this.materials.star);
-        this.shapes.sphere2.draw(context, program_state, star_trans.times(Mat4.translation(-250,250,250)), this.materials.star);
+        for(var i = 0; i < starTuples.length; i++) {
+            this.shapes.sphere.draw(context, program_state, star_trans.times(Mat4.translation(starTuples[i][0],
+                starTuples[i][1], starTuples[i][2])), this.materials.star);
+        }
 
     }
-
-
-
 
     display(context, program_state) {
         // display():  Called once per frame of animation.
