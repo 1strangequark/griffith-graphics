@@ -642,5 +642,7 @@ export class GriffithScene extends Scene {
         this.display_tree(context, program_state, -4, 0, 4, 2);
         this.display_tree(context, program_state, 4, 0, -7, 2);
         this.display_tree(context, program_state, 4, 0, -9, 1);
+
+        this.display_city(context, program_state);
     }
 }
