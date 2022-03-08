@@ -465,7 +465,7 @@ export class GriffithScene extends Scene {
             do {
                 x = 100 + this.getRandomInt(-xVar, xVar);
                 z = 200 + this.getRandomInt(-zVar, zVar);
-            } while (!this.validate_distance(x, z, 25));
+            } while (!this.validate_distance(x, z, 20));
             let height = this.getRandomInt(1, 5);
             this.building_props.push([x,z, height]);
         }
@@ -475,7 +475,7 @@ export class GriffithScene extends Scene {
     {
         for (var i = 0; i < this.building_props.length; i++) {
             for (var j = 0; j < this.building_props[i][2]; j++) {
-                let square_build_trans = Mat4.identity().times(Mat4.translation(this.building_props[i][0],j * 10,this.building_props[i][1])).times(Mat4.scale(5, 5, 5));
+                let square_build_trans = Mat4.identity().times(Mat4.translation(this.building_props[i][0],(j * 10) - 5,this.building_props[i][1])).times(Mat4.scale(5, 5, 5));
                 this.shapes.cube.draw(context, program_state, square_build_trans, this.sun.sun_rise ? this.materials.building : this.materials.building_dark);
             }
         }
