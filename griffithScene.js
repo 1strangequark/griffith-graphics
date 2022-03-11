@@ -301,7 +301,7 @@ export class GriffithScene extends Scene {
 
     }
 
-    display_courtyard_light_bases(context, program_state, x, z)
+    display_courtyard_light_bases(context, program_state, x, z, shadow_pass)
     {
 
         let platform_light_transform1 = Mat4.identity().times(Mat4.translation(x,3,z)).times(Mat4.scale(0.15,0.4,0.15));
@@ -309,10 +309,10 @@ export class GriffithScene extends Scene {
         let platform_light_transform3 = Mat4.identity().times(Mat4.translation(x,4,z)).times(Mat4.scale(0.03,1,0.03));
         let platform_light_transform4 = Mat4.identity().times(Mat4.translation(x,5,z)).times(Mat4.scale(0.16,0.16,0.16));
 
-        this.shapes.cube.draw(context, program_state,platform_light_transform1, this.materials.lightBase);
-        this.shapes.cube.draw(context, program_state,platform_light_transform3, this.materials.lightBase);
-        this.shapes.sphere2.draw(context, program_state,platform_light_transform2, this.materials.lightBase);
-        this.shapes.sphere2.draw(context, program_state,platform_light_transform4, this.materials.lightBulb);
+        this.shapes.cube.draw(context, program_state,platform_light_transform1, shadow_pass ? this.materials.lightBase : this.materials.pure);
+        this.shapes.cube.draw(context, program_state,platform_light_transform3, shadow_pass ? this.materials.lightBase : this.materials.pure);
+        this.shapes.sphere2.draw(context, program_state,platform_light_transform2, shadow_pass ? this.materials.lightBase : this.materials.pure);
+        this.shapes.sphere2.draw(context, program_state,platform_light_transform4, shadow_pass ? this.materials.lightBulb : this.materials.pure);
 
     }
     display_Entry_bushes(context, program_state)
@@ -627,7 +627,24 @@ export class GriffithScene extends Scene {
         this.display_tree(context, program_state, -4, 0, 4, 2, shadow_pass);
         this.display_tree(context, program_state, 4, 0, -7, 2, shadow_pass);
         this.display_tree(context, program_state, 4, 0, -9, 1, shadow_pass);
+
+        //courtyard light bases
+        this.display_courtyard_light_bases(context,program_state, 5.2,5.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, 7.5,5.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, 5.2,-16.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, 7.5,-16.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, 13.2,-11.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, 13.2,0.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, -0.45,-11.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, -0.45,0.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, -17.2,-11.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, -17.2,0.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, -5.2,5.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, -12.5,5.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, -5.2,-15.2, shadow_pass);
+        this.display_courtyard_light_bases(context,program_state, -12.5,-15.2, shadow_pass);
     }
+
     display(context, program_state) {
         // display():  Called once per frame of animation.
 
@@ -751,22 +768,6 @@ export class GriffithScene extends Scene {
                this.setCameraActivity("");
             }
         }
-
-        //courtyard light bases
-        this.display_courtyard_light_bases(context,program_state, 5.2,5.2);
-        this.display_courtyard_light_bases(context,program_state, 7.5,5.2);
-        this.display_courtyard_light_bases(context,program_state, 5.2,-16.2);
-        this.display_courtyard_light_bases(context,program_state, 7.5,-16.2);
-        this.display_courtyard_light_bases(context,program_state, 13.2,-11.2);
-        this.display_courtyard_light_bases(context,program_state, 13.2,0.2);
-        this.display_courtyard_light_bases(context,program_state, -0.45,-11.2);
-        this.display_courtyard_light_bases(context,program_state, -0.45,0.2);
-        this.display_courtyard_light_bases(context,program_state, -17.2,-11.2);
-        this.display_courtyard_light_bases(context,program_state, -17.2,0.2);
-        this.display_courtyard_light_bases(context,program_state, -5.2,5.2);
-        this.display_courtyard_light_bases(context,program_state, -12.5,5.2);
-        this.display_courtyard_light_bases(context,program_state, -5.2,-15.2);
-        this.display_courtyard_light_bases(context,program_state, -12.5,-15.2);
 
         this.display_Entry_bushes(context,program_state);
         this.display_Side_bushes(context, program_state);
