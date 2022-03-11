@@ -1,4 +1,6 @@
 import {defs, tiny} from './examples/common.js';
+import {Color_Phong_Shader, Shadow_Textured_Phong_Shader,
+    Depth_Texture_Shader_2D, Buffered_Texture, LIGHT_DEPTH_TEX_SIZE} from './examples/shadow-demo-shaders.js'
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Texture, Scene,
@@ -19,6 +21,8 @@ export class GriffithScene extends Scene {
         this.camera_activity = "";
         this.orbit_time = 9;
         this.building_props = [];
+        this.light_position = Mat4.identity();
+        this.time_interval = 0;
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
             torus: new defs.Torus(15, 15),
@@ -33,7 +37,6 @@ export class GriffithScene extends Scene {
             triangle: new defs.Triangle(),
             axes: new defs.Axis_Arrows(),
             sun: new defs.Subdivision_Sphere(4),
-
         // TODO:  Fill in as many additional shape instances as needed in this key/value table.
             //        (Requirement 1)
         };
@@ -44,18 +47,18 @@ export class GriffithScene extends Scene {
                 {ambient: .5, diffusivity: .6, color: hex_color("#ffffff")}),
             star: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
-            grass: new Material(new defs.Phong_Shader(),
-                {ambient: 0.7, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46")}),
-            dark_grass: new Material(new defs.Phong_Shader(),
-                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#2f5128")}),
-            light_grass: new Material(new defs.Phong_Shader(),
-                {ambient: 0.6, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32")}),
+            grass: new Material(new Shadow_Textured_Phong_Shader(1),
+                {ambient: 0.7, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46"), light_depth_texture: null, color_texture: null}),
+            dark_grass: new Material(new Shadow_Textured_Phong_Shader(1),
+                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#2f5128"),light_depth_texture: null, color_texture: null}),
+            light_grass: new Material(new Shadow_Textured_Phong_Shader(1),
+                {ambient: 0.6, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32"), light_depth_texture: null, color_texture: null}),
             tree_leaves: new Material(new defs.Phong_Shader(),
                 {ambient: 0.8, diffusivity: 1.0, specularity: 0, color: hex_color("#5aab61")}),
             tree_trunk: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#795c34")}),
-            concrete: new Material(new defs.Phong_Shader(),
-                {ambient: 0.8, diffusivity: 1, specularity: 0, color: hex_color("#93939b")}),
+            concrete: new Material(new Shadow_Textured_Phong_Shader(1),
+                {ambient: 0.8, diffusivity: 1, specularity: 0, color: hex_color("#93939b"), light_depth_texture: null, color_texture: null}),
             sky: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
             lightBase: new Material(new defs.Phong_Shader(),
@@ -70,6 +73,10 @@ export class GriffithScene extends Scene {
                 {ambient: 0.8, diffusivity: 1, specularity: 1, color: hex_color("#000000"), texture: new Texture("assets/building.png")}),
             building_dark: new Material(new Textured_Phong(),
                 {ambient: 1, diffusivity: 1, specularity: 1, color: hex_color("#000000"), texture: new Texture("assets/building_night.png")}),
+            pure: new Material(new Color_Phong_Shader()),
+            light_src: new Material(new defs.Phong_Shader(), {
+                color: color(1, 1, 1, 1), ambient: 1, diffusivity: 0, specularity: 0
+            }),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
@@ -87,6 +94,9 @@ export class GriffithScene extends Scene {
             transform: Mat4.identity(),
         }
         this.update_building_coords();
+
+        // To make sure texture initialization only does once
+        this.init_ok = false;
     }
 
     change_day_night_period(speed_up) {
@@ -177,7 +187,7 @@ export class GriffithScene extends Scene {
         let sky_color;
         let radius = 0;
         if (this.sun.sun_rise)
-            radius = 1000 ** 10;
+            radius = 1000 ** 100;
         else
             radius = 0;
 
@@ -240,8 +250,7 @@ export class GriffithScene extends Scene {
             sky_color
         };
     }
-    display_grass_patches(context, program_state) {
-
+    display_grass_patches(context, program_state, shadow_pass) {
         let platform_grass_transform = Mat4.identity().times(Mat4.translation(10, 3.05, 0)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(3, 5, 3));
         let platform_grass_transform2 = platform_grass_transform.times(Mat4.translation(0, -2.2, 0));
         let platform_grass_transform3 = platform_grass_transform.times(Mat4.translation(-2.4, 0, 0));
@@ -250,18 +259,14 @@ export class GriffithScene extends Scene {
         let platform_grass_transform6 = platform_grass_transform.times(Mat4.translation(-6.25, 2, 0)).times(Mat4.scale(1.4, 0.15, 2));
         let platform_grass_transform7 = platform_grass_transform.times(Mat4.translation(-0.50, 2, 0)).times(Mat4.scale(1.4, 0.15, 2));
 
-
         let material = this.materials.light_grass;
-        this.shapes.square.draw(context, program_state, platform_grass_transform, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform2, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform3, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform4, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform5, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform6, material);
-        this.shapes.square.draw(context, program_state, platform_grass_transform7, material);
-
-
-
+        this.shapes.square.draw(context, program_state, platform_grass_transform, shadow_pass? material: this.materials.pure);
+        this.shapes.square.draw(context, program_state, platform_grass_transform2, shadow_pass? material: this.materials.pure);
+        this.shapes.square.draw(context, program_state, platform_grass_transform3, shadow_pass? material: this.materials.pure);
+        this.shapes.square.draw(context, program_state, platform_grass_transform4, shadow_pass? material: this.materials.pure);
+        this.shapes.square.draw(context, program_state, platform_grass_transform5, shadow_pass? material: this.materials.pure);
+        this.shapes.square.draw(context, program_state, platform_grass_transform6, shadow_pass? material: this.materials.pure);
+        this.shapes.square.draw(context, program_state, platform_grass_transform7, shadow_pass? material: this.materials.pure);
     }
 
     // Use this function to draw trees
@@ -283,17 +288,16 @@ export class GriffithScene extends Scene {
         }
     }
 
-    display_Statue(context, program_state) {
+    display_Statue(context, program_state, shadow_pass) {
 
         let platform_statue_transform1 = Mat4.identity().times(Mat4.translation(6.4,3,-5.5)).times(Mat4.scale(0.5,0.75,0.5));
         let platform_statue_transform2 = Mat4.identity().times(Mat4.translation(6.4,4,-5.5)).times(Mat4.scale(0.4,0.8,0.4));
         let platform_statue_transform3 = Mat4.identity().times(Mat4.translation(6.4,5,-5.5)).times(Mat4.scale(0.28,1.5,0.28));
         let platform_statue_transform4 = Mat4.identity().times(Mat4.translation(6.4,6,-5.5)).times(Mat4.scale(0.28,1.5,0.28));
-
-        this.shapes.cube.draw(context, program_state,platform_statue_transform1, this.materials.test);
-        this.shapes.cube.draw(context, program_state,platform_statue_transform2, this.materials.test);
-        this.shapes.cube.draw(context, program_state,platform_statue_transform3, this.materials.test);
-        this.shapes.sphere2.draw(context, program_state,platform_statue_transform4, this.materials.test);
+        this.shapes.cube.draw(context, program_state,platform_statue_transform1, shadow_pass? this.materials.test: this.materials.pure);
+        this.shapes.cube.draw(context, program_state,platform_statue_transform2, shadow_pass? this.materials.test: this.materials.pure);
+        this.shapes.cube.draw(context, program_state,platform_statue_transform3, shadow_pass? this.materials.test: this.materials.pure);
+        this.shapes.sphere2.draw(context, program_state,platform_statue_transform4, shadow_pass? this.materials.test: this.materials.pure);
 
     }
 
@@ -507,8 +511,118 @@ export class GriffithScene extends Scene {
 
     }
 
+    texture_buffer_init(gl) {
+        // Depth Texture
+        this.lightDepthTexture = gl.createTexture();
+        // Bind it to TinyGraphics
+        this.light_depth_texture = new Buffered_Texture(this.lightDepthTexture);
+        this.materials.grass.light_depth_texture = this.light_depth_texture;
+        this.materials.concrete.light_depth_texture = this.light_depth_texture;
+        this.materials.light_grass.light_depth_texture = this.light_depth_texture;
+        this.materials.dark_grass.light_depth_texture = this.light_depth_texture;
+
+        this.lightDepthTextureSize = LIGHT_DEPTH_TEX_SIZE;
+        gl.bindTexture(gl.TEXTURE_2D, this.lightDepthTexture);
+        gl.texImage2D(
+            gl.TEXTURE_2D,      // target
+            0,                  // mip level
+            gl.DEPTH_COMPONENT, // internal format
+            this.lightDepthTextureSize,   // width
+            this.lightDepthTextureSize,   // height
+            0,                  // border
+            gl.DEPTH_COMPONENT, // format
+            gl.UNSIGNED_INT,    // type
+            null);              // data
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+        // Depth Texture Buffer
+        this.lightDepthFramebuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.lightDepthFramebuffer);
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,       // target
+            gl.DEPTH_ATTACHMENT,  // attachment point
+            gl.TEXTURE_2D,        // texture target
+            this.lightDepthTexture,         // texture
+            0);                   // mip level
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+        // create a color texture of the same size as the depth texture
+        // see article why this is needed_
+        this.unusedTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.unusedTexture);
+        gl.texImage2D(
+            gl.TEXTURE_2D,
+            0,
+            gl.RGBA,
+            this.lightDepthTextureSize,
+            this.lightDepthTextureSize,
+            0,
+            gl.RGBA,
+            gl.UNSIGNED_BYTE,
+            null,
+        );
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        // attach it to the framebuffer
+        gl.framebufferTexture2D(
+            gl.FRAMEBUFFER,        // target
+            gl.COLOR_ATTACHMENT0,  // attachment point
+            gl.TEXTURE_2D,         // texture target
+            this.unusedTexture,         // texture
+            0);                    // mip level
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    }
+
+    render_scene(context, program_state, shadow_pass, draw_light_source=false, draw_shadow=false){
+        // shadow_pass: true if this is the second pass that draw the shadow.
+        // draw_light_source: true if we want to draw the light source.
+        // draw_shadow: true if we want to draw the shadow
+
+        let light_position = this.light_position;
+        let light_color = this.light_color;
+        const t = program_state.animation_time;
+
+        program_state.draw_shadow = draw_shadow;
+
+        //create statue in the courtyard
+        this.display_Statue(context,program_state, shadow_pass);
+        // create day and night sequence
+        if(this.sun.sun_rise) {
+            this.shapes.sun.draw(context, program_state, this.sun.transform,
+                this.materials.sun);
+        }
+
+        //Draw the ground and sky
+        this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
+            .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), shadow_pass? this.materials.grass : this.materials.pure);
+        this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), shadow_pass?this.materials.sky.override({color: this.day_night_sequence_m.sky_color}): this.materials.pure);
+        // Create platform for observatory to rest on
+        let platform_square_transform = Mat4.identity().times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(20, 30, 3));
+        this.shapes.cube.draw(context, program_state, platform_square_transform,  this.materials.concrete);
+
+        // Create grass on platform
+        this.display_grass_patches(context, program_state, shadow_pass);
+    }
     display(context, program_state) {
         // display():  Called once per frame of animation.
+
+        const gl = context.context;
+
+        if (!this.init_ok) {
+            const ext = gl.getExtension('WEBGL_depth_texture');
+            if (!ext) {
+                return alert('need WEBGL_depth_texture');  // eslint-disable-line
+            }
+            this.texture_buffer_init(gl);
+
+            this.init_ok = true;
+        }
+
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
@@ -521,7 +635,6 @@ export class GriffithScene extends Scene {
 
         // this.shapes.[XXX].draw([XXX]) // <--example
 
-        const light_position = vec4(0, 5, 5, 1);
         const yellow = hex_color("#fac91a");
         const white = hex_color("#ef0505");
 
@@ -530,12 +643,18 @@ export class GriffithScene extends Scene {
         let model_transform = Mat4.identity();
 
         // Day and night cycle calculations
-        let day_night_sequence = this.day_night_sequence(context, program_state, t,dt);
+        this.day_night_sequence_m = this.day_night_sequence(context, program_state, t,dt);
+
+        this.time_interval +=dt;
+        if(!this.sun.sun_rise){
+            this.time_interval = 0;
+        }
+        this.light_position = Mat4.rotation(0.5*this.time_interval/this.sun.day_night_period , 0, 0, 1).times(vec4(4, 10, -10, 1));
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
-
-            new Light(day_night_sequence.light_position, sun_yellow, day_night_sequence.radius),
+            new Light(this.light_position, sun_yellow, this.day_night_sequence_m.radius),
+            new Light(this.day_night_sequence_m.light_position, sun_yellow, this.day_night_sequence_m.radius),
             //courtyard Lights
             new Light(vec4(5.2, 5, 5.2, 1), yellow, this.lights_size),
             new Light(vec4(7.5, 5, 5.2, 1), yellow, this.lights_size),
@@ -559,26 +678,38 @@ export class GriffithScene extends Scene {
 
         ];
 
-        // create day and night sequence
-        if(this.sun.sun_rise) {
-            this.shapes.sun.draw(context, program_state, this.sun.transform,
-                this.materials.sun);
-        }
+        // --------------------- SHADOWING -----------------------------------
+        // This is a rough target of the light.
+        // Although the light is point light, we need a target to set the POV of the light
+        this.light_view_target = vec4(0, 0, 0, 1);
+        this.light_field_of_view = 130 * Math.PI / 180;
+        //this.light_position = this.day_night_sequence_m.light_position;
 
-        //Draw the ground and sky
-        this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
-            .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), this.materials.grass);
-        this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky.override({color: day_night_sequence.sky_color}));
+        // Step 1: set the perspective and camera to the POV of light
+        const light_view_mat = Mat4.look_at(
+            vec3(this.light_position[0], this.light_position[1], this.light_position[2]),
+            vec3(this.light_view_target[0], this.light_view_target[1], this.light_view_target[2]),
+            vec3(0, 1, 0), // assume the light to target will have a up dir of +y, maybe need to change according to your case
+        );
+        const light_proj_mat = Mat4.perspective(this.light_field_of_view, 1, 0.5, 500);
+        // Bind the Depth Texture Buffer
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.lightDepthFramebuffer);
+        gl.viewport(0, 0, this.lightDepthTextureSize, this.lightDepthTextureSize);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        // Prepare uniforms
+        program_state.light_view_mat = light_view_mat;
+        program_state.light_proj_mat = light_proj_mat;
+        program_state.light_tex_mat = light_proj_mat;
+        program_state.view_mat = light_view_mat;
+        program_state.projection_transform = light_proj_mat;
+        this.render_scene(context, program_state, false,false, false);
 
-        // Create platform for observatory to rest on
-        let platform_square_transform = Mat4.identity().times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(20, 30, 3));
-        this.shapes.cube.draw(context, program_state, platform_square_transform, this.materials.concrete);
-
-        // Create grass on platform
-        this.display_grass_patches(context, program_state);
-
-        //create statue in the courtyard
-        this.display_Statue(context,program_state);
+        // Step 2: unbind, draw to the canvas
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        program_state.view_mat = program_state.camera_inverse;
+        program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 0.5, 500);
+        this.render_scene(context, program_state, true,true, true);
 
         const speed_factor = 0.5;
         //CAMERA POSITION
