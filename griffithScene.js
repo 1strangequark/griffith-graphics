@@ -53,11 +53,19 @@ export class GriffithScene extends Scene {
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#2f5128"),light_depth_texture: null, color_texture: null}),
             light_grass: new Material(new Shadow_Textured_Phong_Shader(1),
                 {ambient: 0.6, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32"), light_depth_texture: null, color_texture: null}),
+            grass_phong: new Material(new defs.Phong_Shader(),
+                {ambient: 0.7, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46"), light_depth_texture: null, color_texture: null}),
+            dark_grass_phong: new Material(new defs.Phong_Shader(),
+                {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#2f5128"),light_depth_texture: null, color_texture: null}),
+            light_grass_phong: new Material(new defs.Phong_Shader(),
+                {ambient: 0.6, diffusivity: 1.0, specularity: 0, color: hex_color("#4d7c32"), light_depth_texture: null, color_texture: null}),
             tree_leaves: new Material(new defs.Phong_Shader(),
                 {ambient: 0.8, diffusivity: 1.0, specularity: 0, color: hex_color("#5aab61")}),
             tree_trunk: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#795c34")}),
             concrete: new Material(new Shadow_Textured_Phong_Shader(1),
+                {ambient: 0.8, diffusivity: 1, specularity: 0, color: hex_color("#93939b"), light_depth_texture: null, color_texture: null}),
+            concrete_phong: new Material(new defs.Phong_Shader(),
                 {ambient: 0.8, diffusivity: 1, specularity: 0, color: hex_color("#93939b"), light_depth_texture: null, color_texture: null}),
             sky: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
@@ -250,7 +258,7 @@ export class GriffithScene extends Scene {
             sky_color
         };
     }
-    display_grass_patches(context, program_state, shadow_pass) {
+    display_grass_patches(context, program_state, shadow_pass, isDay) {
         let platform_grass_transform = Mat4.identity().times(Mat4.translation(10, 3.05, 0)).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(3, 5, 3));
         let platform_grass_transform2 = platform_grass_transform.times(Mat4.translation(0, -2.2, 0));
         let platform_grass_transform3 = platform_grass_transform.times(Mat4.translation(-2.4, 0, 0));
@@ -259,14 +267,20 @@ export class GriffithScene extends Scene {
         let platform_grass_transform6 = platform_grass_transform.times(Mat4.translation(-6.25, 2, 0)).times(Mat4.scale(1.4, 0.15, 2));
         let platform_grass_transform7 = platform_grass_transform.times(Mat4.translation(-0.50, 2, 0)).times(Mat4.scale(1.4, 0.15, 2));
 
-        let material = this.materials.light_grass;
-        this.shapes.square.draw(context, program_state, platform_grass_transform, shadow_pass? material: this.materials.pure);
-        this.shapes.square.draw(context, program_state, platform_grass_transform2, shadow_pass? material: this.materials.pure);
-        this.shapes.square.draw(context, program_state, platform_grass_transform3, shadow_pass? material: this.materials.pure);
-        this.shapes.square.draw(context, program_state, platform_grass_transform4, shadow_pass? material: this.materials.pure);
-        this.shapes.square.draw(context, program_state, platform_grass_transform5, shadow_pass? material: this.materials.pure);
-        this.shapes.square.draw(context, program_state, platform_grass_transform6, shadow_pass? material: this.materials.pure);
-        this.shapes.square.draw(context, program_state, platform_grass_transform7, shadow_pass? material: this.materials.pure);
+        let material;
+
+        if(isDay){
+            material = shadow_pass? this.materials.light_grass: this.materials.pure
+        } else {
+            material = this.materials.light_grass_phong;
+        }
+        this.shapes.square.draw(context, program_state, platform_grass_transform, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform2, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform3, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform4, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform5, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform6, material);
+        this.shapes.square.draw(context, program_state, platform_grass_transform7, material);
     }
 
     // Use this function to draw trees
@@ -311,8 +325,8 @@ export class GriffithScene extends Scene {
 
         this.shapes.cube.draw(context, program_state,platform_light_transform1, shadow_pass ? this.materials.lightBase : this.materials.pure);
         this.shapes.cube.draw(context, program_state,platform_light_transform3, shadow_pass ? this.materials.lightBase : this.materials.pure);
-        this.shapes.sphere2.draw(context, program_state,platform_light_transform2, shadow_pass ? this.materials.lightBase : this.materials.pure);
-        this.shapes.sphere2.draw(context, program_state,platform_light_transform4, shadow_pass ? this.materials.lightBulb : this.materials.pure);
+        this.shapes.sphere2.draw(context, program_state,platform_light_transform2, this.materials.lightBase );
+        this.shapes.sphere2.draw(context, program_state,platform_light_transform4, this.materials.lightBulb );
 
     }
     display_Entry_bushes(context, program_state, shadow_pass)
@@ -578,7 +592,7 @@ export class GriffithScene extends Scene {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
 
-    render_scene(context, program_state, shadow_pass, draw_light_source=false, draw_shadow=false){
+    render_scene(context, program_state, shadow_pass, draw_light_source=false, draw_shadow=false, isDay){
         // shadow_pass: true if this is the second pass that draw the shadow.
         // draw_light_source: true if we want to draw the light source.
         // draw_shadow: true if we want to draw the shadow
@@ -597,16 +611,29 @@ export class GriffithScene extends Scene {
                 this.materials.sun);
         }
 
-        //Draw the ground and sky
-        this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
-            .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), shadow_pass? this.materials.grass : this.materials.pure);
-        this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), shadow_pass?this.materials.sky.override({color: this.day_night_sequence_m.sky_color}): this.materials.pure);
-        // Create platform for observatory to rest on
         let platform_square_transform = Mat4.identity().times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(20, 30, 3));
-        this.shapes.cube.draw(context, program_state, platform_square_transform,  this.materials.concrete);
+
+        //Draw the ground and sky
+        if(isDay){
+            this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), shadow_pass? this.materials.grass : this.materials.pure);
+            this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), shadow_pass?this.materials.sky.override({color: this.day_night_sequence_m.sky_color}): this.materials.pure);
+
+            // Create platform for observatory to rest on
+            this.shapes.cube.draw(context, program_state, platform_square_transform,  this.materials.concrete);
+        } else {
+            this.shapes.square.draw(context, program_state, Mat4.translation(0, -10, 0)
+                .times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(Mat4.scale(1000, 1000, 1)), this.materials.grass_phong);
+            this.shapes.sphere.draw(context, program_state, Mat4.scale(500, 500, 500), this.materials.sky.override({color: this.day_night_sequence_m.sky_color}));
+
+            // Create platform for observatory to rest on
+            this.shapes.cube.draw(context, program_state, platform_square_transform,  this.materials.concrete_phong);
+        }
+
+
 
         // Create grass on platform
-        this.display_grass_patches(context, program_state, shadow_pass);
+        this.display_grass_patches(context, program_state, shadow_pass, isDay);
 
         // Create trees on platform
         // front and back (camera view)
@@ -721,35 +748,42 @@ export class GriffithScene extends Scene {
         // --------------------- SHADOWING -----------------------------------
         // This is a rough target of the light.
         // Although the light is point light, we need a target to set the POV of the light
-        this.light_view_target = vec4(0, 0, 0, 1);
-        this.light_field_of_view = 130 * Math.PI / 180;
-        //this.light_position = this.day_night_sequence_m.light_position;
 
-        // Step 1: set the perspective and camera to the POV of light
-        const light_view_mat = Mat4.look_at(
-            vec3(this.light_position[0], this.light_position[1], this.light_position[2]),
-            vec3(this.light_view_target[0], this.light_view_target[1], this.light_view_target[2]),
-            vec3(0, 1, 0), // assume the light to target will have a up dir of +y, maybe need to change according to your case
-        );
-        const light_proj_mat = Mat4.perspective(this.light_field_of_view, 1, 0.5, 500);
-        // Bind the Depth Texture Buffer
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.lightDepthFramebuffer);
-        gl.viewport(0, 0, this.lightDepthTextureSize, this.lightDepthTextureSize);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        // Prepare uniforms
-        program_state.light_view_mat = light_view_mat;
-        program_state.light_proj_mat = light_proj_mat;
-        program_state.light_tex_mat = light_proj_mat;
-        program_state.view_mat = light_view_mat;
-        program_state.projection_transform = light_proj_mat;
-        this.render_scene(context, program_state, false,false, false);
+        if(this.sun.sun_rise) {
+            this.light_view_target = vec4(0, 0, 0, 1);
+            this.light_field_of_view = 130 * Math.PI / 180;
+            //this.light_position = this.day_night_sequence_m.light_position;
 
-        // Step 2: unbind, draw to the canvas
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        program_state.view_mat = program_state.camera_inverse;
-        program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 0.5, 500);
-        this.render_scene(context, program_state, true,true, true);
+            // Step 1: set the perspective and camera to the POV of light
+            const light_view_mat = Mat4.look_at(
+                vec3(this.light_position[0], this.light_position[1], this.light_position[2]),
+                vec3(this.light_view_target[0], this.light_view_target[1], this.light_view_target[2]),
+                vec3(0, 1, 0), // assume the light to target will have a up dir of +y, maybe need to change according to your case
+            );
+            const light_proj_mat = Mat4.perspective(this.light_field_of_view, 1, 0.5, 500);
+            // Bind the Depth Texture Buffer
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.lightDepthFramebuffer);
+            gl.viewport(0, 0, this.lightDepthTextureSize, this.lightDepthTextureSize);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            // Prepare uniforms
+            program_state.light_view_mat = light_view_mat;
+            program_state.light_proj_mat = light_proj_mat;
+            program_state.light_tex_mat = light_proj_mat;
+            program_state.view_mat = light_view_mat;
+            program_state.projection_transform = light_proj_mat;
+            this.render_scene(context, program_state, false, false, false);
+
+            // Step 2: unbind, draw to the canvas
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+            program_state.view_mat = program_state.camera_inverse;
+            program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 0.5, 500);
+            this.render_scene(context, program_state, true, true, true, this.sun.sun_rise);
+        } else {
+            this.render_scene(context, program_state, true, true, false, this.sun.sun_rise);
+
+        }
+
 
         const speed_factor = 0.5;
         //CAMERA POSITION
