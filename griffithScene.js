@@ -720,7 +720,7 @@ export class GriffithScene extends Scene {
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
-            new Light(this.light_position, sun_yellow, this.day_night_sequence_m.radius*1000),
+            //new Light(this.light_position, sun_yellow, this.day_night_sequence_m.radius),
             new Light(this.day_night_sequence_m.light_position, sun_yellow, this.day_night_sequence_m.radius),
             //courtyard Lights
             new Light(vec4(5.2, 5, 5.2, 1), yellow, this.lights_size),
