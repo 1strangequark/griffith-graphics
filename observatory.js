@@ -48,12 +48,6 @@ export class ObservatoryScene extends Scene {
         this.initial_camera_location = Mat4.look_at(vec3(-35, 13, -20), vec3(0, 5, 25), vec3(0, 1, 0));
     }
 
-    make_control_panel() {
-        // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("Example Command Name", ["Control", "0"], () => this.attached = () => null);
-        this.new_line();
-    }
-
     display_windows(context, program_state) {
         let window_offset = 3;
         while (window_offset < 13) {
