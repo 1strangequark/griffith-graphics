@@ -1,6 +1,7 @@
-# griffith-graphics
+# Griffith Graphics
 This project is a 3D model of the griffith observatory in Los Angeles, California.
 #### Repository link: https://github.com/1strangequark/griffith-graphics
+#### Team members: Jonathan Davies, Arian Jafari, Maria Ignacio, Kate Land
 ### How to run:
 #### From Command Line:
 1. Navigate to the griffith-graphics directory.
