@@ -106,8 +106,7 @@ export class GriffithScene extends Scene {
         this.sun.day_night_interval = 0;
         this.sun.max_day_night_interval = 0;
         this.sun.theta =  Math.PI / this.sun.day_night_period;
-        let identity = Mat4.identity();
-        this.sun.transform = identity;
+        this.sun.transform = Mat4.identity();
         this.sun.sun_rise = true;
     }
 
