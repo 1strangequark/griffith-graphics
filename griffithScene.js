@@ -777,7 +777,7 @@ export class GriffithScene extends Scene {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
             program_state.view_mat = program_state.camera_inverse;
-            program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 0.1, 5000);
+            program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 0.095, 5000);
             this.render_scene(context, program_state, true, true, true, this.sun.sun_rise);
         } else {
             this.render_scene(context, program_state, true, true, false, this.sun.sun_rise);
