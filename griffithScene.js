@@ -748,7 +748,6 @@ export class GriffithScene extends Scene {
         // --------------------- SHADOWING -----------------------------------
         // This is a rough target of the light.
         // Although the light is point light, we need a target to set the POV of the light
-        if(this.sun.sun_rise) {
             this.light_view_target = vec4(0, 0, 0, 1);
             this.light_field_of_view = 130 * Math.PI / 180;
             //this.light_position = this.day_night_sequence_m.light_position;
@@ -777,10 +776,6 @@ export class GriffithScene extends Scene {
             program_state.view_mat = program_state.camera_inverse;
             program_state.projection_transform = Mat4.perspective(Math.PI / 4, context.width / context.height, 0.095, 5000);
             this.render_scene(context, program_state, true, true, true, this.sun.sun_rise);
-        } else {
-            this.render_scene(context, program_state, true, true, false, this.sun.sun_rise);
-
-        }
 
 
         const speed_factor = 0.5;
