@@ -271,20 +271,20 @@ export class GriffithScene extends Scene {
 
     // Use this function to draw trees
     // version is to select a different version of tree (default is 1))
-    display_tree(context, program_state, x, y, z, version = 1) {
+    display_tree(context, program_state, x, y, z, version = 1, shadow_pass) {
         if (version == 1) {
             let leaves_transform = Mat4.identity().times(Mat4.translation(x, y+5, z));
             let trunk_transform = leaves_transform.times(Mat4.scale(.1, 1, .1)).times(Mat4.translation(0, -1, 0));
-            this.shapes.sphere.draw(context, program_state, leaves_transform, this.materials.tree_leaves);
-            this.shapes.cube.draw(context, program_state, trunk_transform, this.materials.tree_trunk);
+            this.shapes.sphere.draw(context, program_state, leaves_transform, shadow_pass ? this.materials.tree_leaves : this.materials.pure);
+            this.shapes.cube.draw(context, program_state, trunk_transform, shadow_pass ? this.materials.tree_trunk : this.materials.pure);
         }
         else {
             let leaves_transform = Mat4.identity().times(Mat4.translation(x, y+5, z));
             let leaves2_transform = leaves_transform.times(Mat4.translation(0, 1.4, 0)).times(Mat4.scale(1.4, 1.4, 1.4));
             let trunk_transform = leaves_transform.times(Mat4.scale(.1, 1, .1)).times(Mat4.translation(0, -1, 0));
-            this.shapes.sphere.draw(context, program_state, leaves_transform, this.materials.tree_leaves);
-            this.shapes.sphere.draw(context, program_state, leaves2_transform, this.materials.tree_leaves);
-            this.shapes.cube.draw(context, program_state, trunk_transform, this.materials.tree_trunk);
+            this.shapes.sphere.draw(context, program_state, leaves_transform, shadow_pass ? this.materials.tree_leaves : this.materials.pure);
+            this.shapes.sphere.draw(context, program_state, leaves2_transform, shadow_pass ? this.materials.tree_leaves : this.materials.pure);
+            this.shapes.cube.draw(context, program_state, trunk_transform, shadow_pass ? this.materials.tree_trunk : this.materials.pure);
         }
     }
 
@@ -607,6 +607,26 @@ export class GriffithScene extends Scene {
 
         // Create grass on platform
         this.display_grass_patches(context, program_state, shadow_pass);
+
+        // Create trees on platform
+        // front and back (camera view)
+        let x = -23;
+        for (let i = 0; i < 2; i ++) {
+            this.display_tree(context, program_state, x, -2.4, -16, 2, shadow_pass);
+            this.display_tree(context, program_state, x, -2.2, -13, 1, shadow_pass);
+            this.display_tree(context, program_state, x, -2, -10, 2, shadow_pass);
+            this.display_tree(context, program_state, x, -1.8, -7, 1, shadow_pass);
+            this.display_tree(context, program_state, x, -1.5, -4, 2, shadow_pass);
+            this.display_tree(context, program_state, x, -1.6, -1, 1, shadow_pass);
+            this.display_tree(context, program_state, x, -1.8, 2, 2, shadow_pass);
+            this.display_tree(context, program_state, x, -1.9, 5, 1, shadow_pass);
+            this.display_tree(context, program_state, x, -2, 8, 2, shadow_pass);
+            x = 25;
+        }
+        // platform
+        this.display_tree(context, program_state, -4, 0, 4, 2, shadow_pass);
+        this.display_tree(context, program_state, 4, 0, -7, 2, shadow_pass);
+        this.display_tree(context, program_state, 4, 0, -9, 1, shadow_pass);
     }
     display(context, program_state) {
         // display():  Called once per frame of animation.
@@ -649,11 +669,11 @@ export class GriffithScene extends Scene {
         if(!this.sun.sun_rise){
             this.time_interval = 0;
         }
-        this.light_position = Mat4.rotation(0.5*this.time_interval/this.sun.day_night_period , 0, 0, 1).times(vec4(4, 10, -10, 1));
+        this.light_position = Mat4.translation((this.time_interval*-50)/this.sun.day_night_period , 0, 0, 1).times(vec4(5, 10, -10, 1));
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
-            new Light(this.light_position, sun_yellow, this.day_night_sequence_m.radius),
+            new Light(this.light_position, sun_yellow, this.day_night_sequence_m.radius*10),
             new Light(this.day_night_sequence_m.light_position, sun_yellow, this.day_night_sequence_m.radius),
             //courtyard Lights
             new Light(vec4(5.2, 5, 5.2, 1), yellow, this.lights_size),
@@ -759,26 +779,6 @@ export class GriffithScene extends Scene {
         this.shapes.sphere.draw(context, program_state, hill_transform, this.materials.dark_grass);
 
         this.display_HollywoodSign(context,program_state);
-
-        // Create trees on platform
-            // front and back (camera view)
-        let x = -23;
-        for (let i = 0; i < 2; i ++) {
-            this.display_tree(context, program_state, x, -2.4, -16, 2);
-            this.display_tree(context, program_state, x, -2.2, -13, 1);
-            this.display_tree(context, program_state, x, -2, -10, 2);
-            this.display_tree(context, program_state, x, -1.8, -7, 1);
-            this.display_tree(context, program_state, x, -1.5, -4, 2);
-            this.display_tree(context, program_state, x, -1.6, -1, 1);
-            this.display_tree(context, program_state, x, -1.8, 2, 2);
-            this.display_tree(context, program_state, x, -1.9, 5, 1);
-            this.display_tree(context, program_state, x, -2, 8, 2);
-            x = 25;
-        }
-            // platform
-        this.display_tree(context, program_state, -4, 0, 4, 2);
-        this.display_tree(context, program_state, 4, 0, -7, 2);
-        this.display_tree(context, program_state, 4, 0, -9, 1);
 
         this.display_city(context, program_state);
     }
