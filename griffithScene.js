@@ -102,12 +102,13 @@ export class GriffithScene extends Scene {
         this.sun.max_interval = this.sun.day_night_period + (0.05 * this.sun.day_night_period);
         this.sun.transition = this.sun.day_night_period / 10;
         this.sun.max_day_interval = this.sun.max_interval * 2;
-        this.sun.track_transition =0;
+        this.sun.track_transition = 0;
         this.sun.day_night_interval = 0;
         this.sun.max_day_night_interval = 0;
         this.sun.theta =  Math.PI / this.sun.day_night_period;
         let identity = Mat4.identity();
-        this.sun.transform = identity.times(Mat4.translation(200,5,215)).times(Mat4.scale(5,5,5));
+        this.sun.transform = identity;
+        this.sun.sun_rise = true;
     }
 
     setCameraActivity(activity) {
