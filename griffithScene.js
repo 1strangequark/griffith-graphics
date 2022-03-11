@@ -48,7 +48,7 @@ export class GriffithScene extends Scene {
             star: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#87CEEB")}),
             grass: new Material(new Shadow_Textured_Phong_Shader(1),
-                {ambient: 0.7, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46"), light_depth_texture: null, color_texture: null}),
+                {ambient: 0.8, diffusivity: 1.0, specularity: 0, color: hex_color("#466d46"), light_depth_texture: null, color_texture: null}),
             dark_grass: new Material(new Shadow_Textured_Phong_Shader(1),
                 {ambient: 1, diffusivity: 1.0, specularity: 0, color: hex_color("#2f5128"),light_depth_texture: null, color_texture: null}),
             light_grass: new Material(new Shadow_Textured_Phong_Shader(1),
@@ -250,7 +250,7 @@ export class GriffithScene extends Scene {
         }
 
         this.sun.transform = transform.times(Mat4.translation(x, y, z_1)).times(Mat4.scale(5, 5, 5));
-        let light_position = vec4(this.sun.transform[0][3], -this.sun.transform[1][3], this.sun.transform[2][3], this.sun.transform[3][3]);
+        let light_position = vec4(this.sun.transform[0][3], this.sun.transform[1][3], this.sun.transform[2][3], this.sun.transform[3][3]);
 
         return {
             light_position,
@@ -716,11 +716,11 @@ export class GriffithScene extends Scene {
         if(!this.sun.sun_rise){
             this.time_interval = 0;
         }
-        this.light_position = Mat4.translation((this.time_interval*-50)/this.sun.day_night_period , 0, 0, 1).times(vec4(5, 10, -10, 1));
+        this.light_position = Mat4.translation(-50*Math.sin(this.time_interval*this.sun.theta/2), 0, 0).times(vec4(5, 15, -10, 1));
 
         // The parameters of the Light are: position, color, size
         program_state.lights = [
-            new Light(this.light_position, sun_yellow, this.day_night_sequence_m.radius*10),
+            new Light(this.light_position, sun_yellow, this.day_night_sequence_m.radius*1000),
             new Light(this.day_night_sequence_m.light_position, sun_yellow, this.day_night_sequence_m.radius),
             //courtyard Lights
             new Light(vec4(5.2, 5, 5.2, 1), yellow, this.lights_size),
@@ -748,12 +748,10 @@ export class GriffithScene extends Scene {
         // --------------------- SHADOWING -----------------------------------
         // This is a rough target of the light.
         // Although the light is point light, we need a target to set the POV of the light
-
         if(this.sun.sun_rise) {
             this.light_view_target = vec4(0, 0, 0, 1);
             this.light_field_of_view = 130 * Math.PI / 180;
             //this.light_position = this.day_night_sequence_m.light_position;
-
             // Step 1: set the perspective and camera to the POV of light
             const light_view_mat = Mat4.look_at(
                 vec3(this.light_position[0], this.light_position[1], this.light_position[2]),
