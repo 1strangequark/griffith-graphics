@@ -315,18 +315,18 @@ export class GriffithScene extends Scene {
         this.shapes.sphere2.draw(context, program_state,platform_light_transform4, shadow_pass ? this.materials.lightBulb : this.materials.pure);
 
     }
-    display_Entry_bushes(context, program_state)
+    display_Entry_bushes(context, program_state, shadow_pass)
     {
         let bush_transform1 = Mat4.identity().times(Mat4.translation(2.0,5,9.2)).times(Mat4.scale(0.25,1.25,0.25));
         let bush_transform2 = Mat4.identity().times(Mat4.translation(-2.4,5,9.2)).times(Mat4.scale(0.25,1.25,0.25));
 
-        this.shapes.sphere3.draw(context, program_state,bush_transform1, this.materials.dark_grass);
-        this.shapes.sphere3.draw(context, program_state,bush_transform2, this.materials.dark_grass);
-        this.shapes.cube.draw(context, program_state,bush_transform1.times(Mat4.scale(1,0.15,1)).times(Mat4.translation(0,-5,0)), this.materials.bushBase);
-        this.shapes.cube.draw(context, program_state,bush_transform2.times(Mat4.scale(1,0.15,1)).times(Mat4.translation(0,-5,0)), this.materials.bushBase);
+        this.shapes.sphere3.draw(context, program_state,bush_transform1, shadow_pass ? this.materials.dark_grass : this.materials.pure);
+        this.shapes.sphere3.draw(context, program_state,bush_transform2, shadow_pass ? this.materials.dark_grass : this.materials.pure);
+        this.shapes.cube.draw(context, program_state,bush_transform1.times(Mat4.scale(1,0.15,1)).times(Mat4.translation(0,-5,0)), shadow_pass ? this.materials.bushBase : this.materials.pure);
+        this.shapes.cube.draw(context, program_state,bush_transform2.times(Mat4.scale(1,0.15,1)).times(Mat4.translation(0,-5,0)), shadow_pass ? this.materials.bushBase : this.materials.pure);
     }
 
-    display_Side_bushes(context, program_state)
+    display_Side_bushes(context, program_state, shadow_pass)
     {
         let bush_transform1 = Mat4.identity().times(Mat4.translation(6.0,3.8,9.9)).times(Mat4.scale(0.35,0.9,0.35));
         let bush_transform2 = Mat4.identity().times(Mat4.translation(10.0,3.8,9.9)).times(Mat4.scale(0.35,0.9,0.35));
@@ -334,10 +334,10 @@ export class GriffithScene extends Scene {
         let bush_transform3 = Mat4.identity().times(Mat4.translation(-6.4,3.8,9.9)).times(Mat4.scale(0.35,0.9,0.35));
         let bush_transform4 = Mat4.identity().times(Mat4.translation(-10.4,3.8,9.9)).times(Mat4.scale(0.35,0.9,0.35));
 
-        this.shapes.sphere3.draw(context, program_state,bush_transform1, this.materials.dark_grass);
-        this.shapes.sphere3.draw(context, program_state,bush_transform2, this.materials.dark_grass);
-        this.shapes.sphere3.draw(context, program_state,bush_transform3, this.materials.dark_grass);
-        this.shapes.sphere3.draw(context, program_state,bush_transform4, this.materials.dark_grass);
+        this.shapes.sphere3.draw(context, program_state,bush_transform1, shadow_pass ? this.materials.dark_grass : this.materials.pure);
+        this.shapes.sphere3.draw(context, program_state,bush_transform2, shadow_pass ? this.materials.dark_grass : this.materials.pure);
+        this.shapes.sphere3.draw(context, program_state,bush_transform3, shadow_pass ? this.materials.dark_grass : this.materials.pure);
+        this.shapes.sphere3.draw(context, program_state,bush_transform4, shadow_pass ? this.materials.dark_grass : this.materials.pure);
 
     }
 
@@ -643,6 +643,9 @@ export class GriffithScene extends Scene {
         this.display_courtyard_light_bases(context,program_state, -12.5,5.2, shadow_pass);
         this.display_courtyard_light_bases(context,program_state, -5.2,-15.2, shadow_pass);
         this.display_courtyard_light_bases(context,program_state, -12.5,-15.2, shadow_pass);
+
+        this.display_Entry_bushes(context,program_state, shadow_pass);
+        this.display_Side_bushes(context, program_state, shadow_pass);
     }
 
     display(context, program_state) {
@@ -769,8 +772,6 @@ export class GriffithScene extends Scene {
             }
         }
 
-        this.display_Entry_bushes(context,program_state);
-        this.display_Side_bushes(context, program_state);
         this.displayStars(context, program_state);
 
 
