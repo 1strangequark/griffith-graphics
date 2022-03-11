@@ -757,7 +757,7 @@ export class GriffithScene extends Scene {
                 vec3(this.light_view_target[0], this.light_view_target[1], this.light_view_target[2]),
                 vec3(0, 1, 0), // assume the light to target will have a up dir of +y, maybe need to change according to your case
             );
-            const light_proj_mat = Mat4.perspective(this.light_field_of_view, 1, 0.5, 500);
+            const light_proj_mat = Mat4.perspective(this.light_field_of_view, 1, 0.5, 500).times(Mat4.translation(0, 0, 0)).times(Mat4.scale(1, 1, 1));
             // Bind the Depth Texture Buffer
             gl.bindFramebuffer(gl.FRAMEBUFFER, this.lightDepthFramebuffer);
             gl.viewport(0, 0, this.lightDepthTextureSize, this.lightDepthTextureSize);
